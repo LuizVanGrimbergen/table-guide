@@ -144,12 +144,12 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
 
                 <section className="mt-8" aria-live="polite">
                     <h2 className="mb-3 font-serif text-[24px]">
-                        His top picks
+                        Your top picks
                     </h2>
                     {picks.length === 0 ? (
                         <p className="rounded-card border border-dashed border-line-strong p-5 text-[15px] text-ink-muted">
-                            None of his been-there places in {homeCity} fit this
-                            evening yet.
+                            None of your been-there places in {homeCity} fit
+                            this evening yet.
                         </p>
                     ) : (
                         <ol className="flex flex-col gap-3">
@@ -213,7 +213,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                             href={`/collection?occ=${mood}&status=been&hideAvoid=1`}
                             className="mt-4 flex h-12 items-center justify-center text-[15px] font-medium underline underline-offset-4"
                         >
-                            See all {all} in the Collection
+                            See all {all} in My Places
                         </Link>
                     )}
                 </section>

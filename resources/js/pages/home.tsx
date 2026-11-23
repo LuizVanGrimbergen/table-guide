@@ -68,7 +68,7 @@ export default function HomePage({ places, homeCity, received }: Props) {
                             Where to tonight?
                         </span>
                         <span className="block text-sm text-paper/75">
-                            His best picks for this evening
+                            Your best picks for this evening
                         </span>
                     </span>
                     <ChevronRight className="size-6" strokeWidth={1.5} />

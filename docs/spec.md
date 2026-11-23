@@ -32,7 +32,7 @@ Hero image, heart (favourite), kicker (status · occasion), name, area, tags. Fo
 - Date line, title.
 - "How many people?": six large buttons 2, 3, 4, 5, 6, 8+.
 - "What kind of evening?": five large rows with hint and count: Business or clients, Something special, Easy and relaxed, Close to home, Just drinks.
-- "His top picks": top 5 from his own Sydney places that are Been there and not "not recommended". Ranking: favourite +2, good for groups +3 when 6 or more guests, has a note +1. Each pick: rank number, name, area, note, buttons Book a table and Directions (Google Maps directions URL).
+- "Your top picks": top 5 from their own Sydney places that are Been there and not "not recommended". Ranking: favourite +2, good for groups +3 when 6 or more guests, has a note +1. Each pick: rank number, name, area, note, buttons Book a table and Directions (Google Maps directions URL).
 - "See all N in the Collection".
 - Footnote: Book opens the restaurant's own page. Live times come later.
 
