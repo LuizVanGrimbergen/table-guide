@@ -1,3 +1,4 @@
+import type { LucideIcon } from 'lucide-react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -8,10 +9,19 @@ type Props = {
     on: boolean;
     onChoose: () => void;
     multi?: boolean;
+    icon?: LucideIcon;
 };
 
 /** Large row in a picker sheet: label, one-line hint, count, round check. */
-export function ChoiceRow({ label, hint, count, on, onChoose, multi }: Props) {
+export function ChoiceRow({
+    label,
+    hint,
+    count,
+    on,
+    onChoose,
+    multi,
+    icon: Icon,
+}: Props) {
     return (
         <button
             type="button"
@@ -20,6 +30,11 @@ export function ChoiceRow({ label, hint, count, on, onChoose, multi }: Props) {
             onClick={onChoose}
             className="flex min-h-[58px] w-full items-center gap-3 border-b border-line py-2 text-left transition last:border-0 active:opacity-80"
         >
+            {Icon && (
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sand text-ink">
+                    <Icon className="size-[18px]" strokeWidth={1.6} />
+                </span>
+            )}
             <span className="min-w-0 flex-1">
                 <span
                     className={cn(
