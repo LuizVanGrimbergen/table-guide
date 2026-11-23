@@ -120,7 +120,7 @@ export default function FriendsPage({
                                     key={f.id}
                                     className="flex w-20 shrink-0 flex-col items-center text-center"
                                 >
-                                    <span className="flex size-14 items-center justify-center rounded-full bg-burgundy font-serif text-[20px] text-paper">
+                                    <span className="flex size-14 items-center justify-center rounded-full bg-warm font-serif text-[20px] text-paper">
                                         {initials(f.name)}
                                     </span>
                                     <span className="mt-1.5 text-[14px] font-medium">
@@ -158,7 +158,7 @@ export default function FriendsPage({
                                 href={`https://wa.me/?text=${encodeURIComponent(`Join my restaurant circle on The Collection: ${invite.url}`)}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex h-12 items-center justify-center rounded-full bg-olive text-[15px] font-semibold text-paper"
+                                className="flex h-12 items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-paper"
                             >
                                 Send on WhatsApp
                             </a>
@@ -257,7 +257,7 @@ export default function FriendsPage({
                                         </span>
                                     </Link>
                                     {f.saved ? (
-                                        <span className="text-[13px] font-medium text-olive">
+                                        <span className="text-[13px] font-medium text-brand">
                                             Saved
                                         </span>
                                     ) : (
@@ -302,7 +302,7 @@ export default function FriendsPage({
                                     : 'Helps friends pick places for you'}
                             </span>
                         </span>
-                        <span className="text-sm font-medium text-olive">
+                        <span className="text-sm font-medium text-brand">
                             Edit
                         </span>
                     </button>
@@ -319,7 +319,7 @@ export default function FriendsPage({
                                 {VISIBILITY[me.visibility].label}
                             </span>
                         </span>
-                        <span className="text-sm font-medium text-olive">
+                        <span className="text-sm font-medium text-brand">
                             Change
                         </span>
                     </button>

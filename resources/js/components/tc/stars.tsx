@@ -22,7 +22,7 @@ export function Stars({ value, onChange, size = 'lg' }: Props) {
                 const filled = n <= (value ?? 0);
                 const star = (
                     <Star
-                        className={cn(icon, 'text-burgundy')}
+                        className={cn(icon, 'text-gold')}
                         fill={filled ? 'currentColor' : 'none'}
                         strokeWidth={1.5}
                     />

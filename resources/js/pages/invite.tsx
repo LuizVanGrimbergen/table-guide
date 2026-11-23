@@ -7,7 +7,7 @@ export default function InvitePage({ token, from, alreadyFriends }: Props) {
         <>
             <Head title={`${from} invites you`} />
             <div className="mx-auto max-w-md px-5 pt-10 text-center md:pt-16">
-                <span className="mx-auto flex size-20 items-center justify-center rounded-full bg-burgundy font-serif text-[30px] text-paper">
+                <span className="mx-auto flex size-20 items-center justify-center rounded-full bg-warm font-serif text-[30px] text-paper">
                     {from.charAt(0)}
                 </span>
                 <h1 className="mt-5 font-serif text-[30px] leading-tight">

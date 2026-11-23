@@ -62,7 +62,7 @@ export function MoreSheet({
                         router.flushAll();
                         router.post(logout().url);
                     }}
-                    className="flex min-h-[58px] items-center text-left text-[17px] text-burgundy transition active:opacity-70"
+                    className="flex min-h-[58px] items-center text-left text-[17px] text-warm transition active:opacity-70"
                 >
                     Log out
                 </button>

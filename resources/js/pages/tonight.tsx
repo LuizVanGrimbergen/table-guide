@@ -33,7 +33,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
         <>
             <Head title="Tonight" />
             <div className="px-5 pt-3 md:px-0 md:pt-0">
-                <p className="text-[13px] font-semibold tracking-wide text-olive uppercase">
+                <p className="text-[13px] font-semibold tracking-wide text-brand uppercase">
                     {today} · {homeCity}
                 </p>
                 <h1 className="mt-1 font-serif text-[34px] leading-tight md:text-[36px]">
@@ -107,7 +107,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                     className={cn(
                                         'flex min-h-16 items-center gap-3 rounded-card border px-4 py-2.5 text-left transition duration-120 active:scale-[.98]',
                                         on
-                                            ? 'border-olive bg-olive text-paper'
+                                            ? 'border-brand bg-brand text-paper'
                                             : 'border-line bg-paper',
                                     )}
                                 >
@@ -163,7 +163,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                             className={cn(
                                                 'flex size-9 shrink-0 items-center justify-center rounded-full font-serif text-[18px]',
                                                 i === 0
-                                                    ? 'bg-olive text-paper'
+                                                    ? 'bg-brand text-paper'
                                                     : 'bg-sand',
                                             )}
                                         >
@@ -180,7 +180,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                                 {placeLine(p)}
                                             </span>
                                             {p.note && (
-                                                <span className="mt-1.5 block font-serif text-[17px] leading-snug text-espresso italic">
+                                                <span className="mt-1.5 block font-serif text-[17px] leading-snug text-quote italic">
                                                     {p.note}
                                                 </span>
                                             )}
@@ -246,7 +246,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                 ? 'Open their booking page'
                                 : 'Find their booking page'}
                         </a>
-                        <p className="mt-5 rounded-card bg-burgundy-tint p-4 text-[14px] text-espresso">
+                        <p className="mt-5 rounded-card bg-warm-tint p-4 text-[14px] text-quote">
                             Nothing is booked until the restaurant confirms. We
                             can't see live tables yet.
                         </p>

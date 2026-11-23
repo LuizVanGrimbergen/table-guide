@@ -144,9 +144,9 @@ export function TonightHelper({
                 <button
                     type="button"
                     onClick={start}
-                    className="flex w-full items-center gap-4 rounded-card border border-olive bg-olive-tint p-5 text-left transition duration-120 active:scale-[.98]"
+                    className="flex w-full items-center gap-4 rounded-card border border-brand bg-brand-tint p-5 text-left transition duration-120 active:scale-[.98]"
                 >
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-olive text-paper">
+                    <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-paper">
                         <Sparkles className="size-5" strokeWidth={1.6} />
                     </span>
                     <span className="flex-1">
@@ -163,7 +163,7 @@ export function TonightHelper({
             {loading && (
                 <div className="rounded-card border border-line bg-paper p-6 text-center">
                     <Sparkles
-                        className="mx-auto size-6 animate-pulse text-olive"
+                        className="mx-auto size-6 animate-pulse text-brand"
                         strokeWidth={1.6}
                     />
                     <p className="mt-2 font-serif text-[20px]">
@@ -178,7 +178,7 @@ export function TonightHelper({
             )}
 
             {error && (
-                <p className="mt-3 rounded-card bg-burgundy-tint p-4 text-[15px] text-espresso">
+                <p className="mt-3 rounded-card bg-warm-tint p-4 text-[15px] text-quote">
                     {error}
                 </p>
             )}
@@ -192,12 +192,12 @@ export function TonightHelper({
                         <button
                             type="button"
                             onClick={start}
-                            className="h-11 shrink-0 text-[15px] font-medium text-olive underline underline-offset-4"
+                            className="h-11 shrink-0 text-[15px] font-medium text-brand underline underline-offset-4"
                         >
                             Change answers
                         </button>
                     </div>
-                    <p className="mb-4 font-serif text-[18px] text-espresso italic">
+                    <p className="mb-4 font-serif text-[18px] text-quote italic">
                         {result.intro}
                     </p>
 
@@ -218,7 +218,7 @@ export function TonightHelper({
                                             className={cn(
                                                 'flex size-9 shrink-0 items-center justify-center rounded-full font-serif text-[18px]',
                                                 i === 0
-                                                    ? 'bg-olive text-paper'
+                                                    ? 'bg-brand text-paper'
                                                     : 'bg-sand',
                                             )}
                                         >
@@ -238,7 +238,7 @@ export function TonightHelper({
                                             </span>
                                         </Link>
                                     </div>
-                                    <p className="mt-3 text-[15px] font-semibold text-olive">
+                                    <p className="mt-3 text-[15px] font-semibold text-brand">
                                         {p.headline}
                                     </p>
                                     {p.why && (
@@ -383,7 +383,7 @@ export function TonightHelper({
                         <button
                             type="button"
                             onClick={() => void ask()}
-                            className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-olive text-[15px] font-semibold text-paper transition duration-120 active:scale-96"
+                            className="mt-4 flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-paper transition duration-120 active:scale-96"
                         >
                             <Sparkles className="size-5" strokeWidth={1.6} />
                             Show my picks

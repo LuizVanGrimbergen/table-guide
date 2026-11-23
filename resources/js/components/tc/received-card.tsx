@@ -20,7 +20,7 @@ export type Received = {
 export function ReceivedCard({ rec }: { rec: Received }) {
     return (
         <div className="rounded-card border border-line bg-paper p-4">
-            <p className="text-[13px] font-semibold text-olive">
+            <p className="text-[13px] font-semibold text-brand">
                 {rec.from} recommends
             </p>
             <Link
@@ -35,7 +35,7 @@ export function ReceivedCard({ rec }: { rec: Received }) {
                 </span>
             </Link>
             {rec.message && (
-                <p className="mt-2 font-serif text-[18px] leading-snug text-espresso italic">
+                <p className="mt-2 font-serif text-[18px] leading-snug text-quote italic">
                     “{rec.message}”
                 </p>
             )}
@@ -52,7 +52,7 @@ export function ReceivedCard({ rec }: { rec: Received }) {
                 className={cn(
                     'mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition duration-120 active:scale-96',
                     rec.saved
-                        ? 'bg-olive-tint text-olive'
+                        ? 'bg-brand-tint text-brand'
                         : 'bg-ink text-paper',
                 )}
             >

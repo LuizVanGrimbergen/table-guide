@@ -44,7 +44,7 @@ export function ChoiceRow({ label, hint, count, on, onChoose, multi }: Props) {
                 className={cn(
                     'flex size-6 shrink-0 items-center justify-center rounded-full border-[1.5px]',
                     on
-                        ? 'border-olive bg-olive text-paper'
+                        ? 'border-brand bg-brand text-paper'
                         : 'border-line-strong',
                 )}
             >

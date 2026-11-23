@@ -81,7 +81,7 @@ export default function HomePage({ places, homeCity, received }: Props) {
                 {/* Tonight */}
                 <Link
                     href="/tonight"
-                    className="flex min-h-[76px] items-center gap-4 rounded-card bg-olive px-6 text-paper transition duration-120 active:scale-[.98] active:opacity-90"
+                    className="flex min-h-[76px] items-center gap-4 rounded-card bg-brand px-6 text-paper transition duration-120 active:scale-[.98] active:opacity-90"
                 >
                     <Moon className="size-6 shrink-0" strokeWidth={1.5} />
                     <span className="flex-1">
@@ -152,7 +152,7 @@ export default function HomePage({ places, homeCity, received }: Props) {
                     href="/map"
                     className="flex min-h-[88px] items-center gap-4 rounded-card border border-line bg-paper p-5 transition duration-120 active:scale-[.98] active:opacity-90"
                 >
-                    <span className="flex size-12 items-center justify-center rounded-full bg-olive-tint text-olive">
+                    <span className="flex size-12 items-center justify-center rounded-full bg-brand-tint text-brand">
                         <MapPin className="size-6" strokeWidth={1.5} />
                     </span>
                     <span className="flex-1">

@@ -13,22 +13,24 @@
         'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-serif: 'Newsreader', ui-serif, Georgia, serif;
 
-    /* The Collection design tokens (docs/design-system.md) */
-    --color-ivory: #f6f1e8;
-    --color-paper: #fffdf9;
-    --color-ink: #1e1b18;
-    --color-ink-muted: #574f46;
-    --color-line: #e3dacb;
-    --color-line-strong: #d9cfbf;
-    --color-sand: #ede6da;
-    --color-olive: #4f5a2e;
-    --color-olive-tint: #e9eadb;
-    --color-burgundy: #7b2d2b;
-    --color-burgundy-tint: #f3e3df;
-    --color-espresso: #3b2a20;
-    --color-stone: #a69b8c;
-    --color-wishlist: #9a6a1e;
-    --color-not-recommended: #8a4b3a;
+    /* The Collection design tokens: Cognac & Cream (warm, refined) */
+    --color-ivory: #f7f2ea; /* app background, warm cream */
+    --color-paper: #fffdf9; /* cards, sheets, inputs */
+    --color-ink: #2a2420; /* warm charcoal: text, primary buttons, active pills */
+    --color-ink-muted: #6b6158; /* secondary text */
+    --color-line: #e6ddd0;
+    --color-line-strong: #d8ccbb;
+    --color-sand: #efe7db; /* segmented control track */
+    --color-brand: #a0522d; /* cognac: Tonight, checks, links */
+    --color-brand-tint: #f4e6dc;
+    --color-warm: #8b2e3b; /* wine: favourites, warnings */
+    --color-warm-tint: #f6e7e6;
+    --color-gold: #b8862b; /* stars */
+    --color-quote: #3a2f28; /* his notes */
+    --color-stone: #a79c90;
+    --color-been: #3f6b4e; /* bottle green: been there */
+    --color-wishlist: #8a6116; /* ochre: wishlist */
+    --color-not-recommended: #7a6f66;
 
     --radius-input: 12px;
     --radius-card: 16px;
@@ -83,39 +85,39 @@
 }
 
 :root {
-    --background: #f6f1e8;
-    --foreground: #1e1b18;
+    --background: #f7f2ea;
+    --foreground: #2a2420;
     --card: #fffdf9;
-    --card-foreground: #1e1b18;
+    --card-foreground: #2a2420;
     --popover: #fffdf9;
-    --popover-foreground: #1e1b18;
-    --primary: #1e1b18;
+    --popover-foreground: #2a2420;
+    --primary: #2a2420;
     --primary-foreground: #fffdf9;
-    --secondary: #ede6da;
-    --secondary-foreground: #1e1b18;
-    --muted: #ede6da;
-    --muted-foreground: #574f46;
-    --accent: #e9eadb;
-    --accent-foreground: #1e1b18;
-    --destructive: #7b2d2b;
-    --destructive-foreground: #7b2d2b;
-    --border: #e3dacb;
-    --input: #d9cfbf;
-    --ring: #4f5a2e;
-    --chart-1: #4f5a2e;
-    --chart-2: #7b2d2b;
-    --chart-3: #9a6a1e;
-    --chart-4: #3b2a20;
-    --chart-5: #a69b8c;
+    --secondary: #efe7db;
+    --secondary-foreground: #2a2420;
+    --muted: #efe7db;
+    --muted-foreground: #6b6158;
+    --accent: #f4e6dc;
+    --accent-foreground: #2a2420;
+    --destructive: #8b2e3b;
+    --destructive-foreground: #8b2e3b;
+    --border: #e6ddd0;
+    --input: #d8ccbb;
+    --ring: #a0522d;
+    --chart-1: #a0522d;
+    --chart-2: #3f6b4e;
+    --chart-3: #b8862b;
+    --chart-4: #6e8094;
+    --chart-5: #a79c90;
     --radius: 0.75rem;
     --sidebar: #fffdf9;
-    --sidebar-foreground: #1e1b18;
-    --sidebar-primary: #1e1b18;
+    --sidebar-foreground: #2a2420;
+    --sidebar-primary: #2a2420;
     --sidebar-primary-foreground: #fffdf9;
-    --sidebar-accent: #ede6da;
-    --sidebar-accent-foreground: #1e1b18;
-    --sidebar-border: #e3dacb;
-    --sidebar-ring: #4f5a2e;
+    --sidebar-accent: #efe7db;
+    --sidebar-accent-foreground: #2a2420;
+    --sidebar-border: #e6ddd0;
+    --sidebar-ring: #a0522d;
 }
 
 .dark {

@@ -114,7 +114,7 @@ export function AddSheet({ open, onOpenChange }: Props) {
                     {form.data.google_place_id && (
                         <p className="mt-2 flex items-start gap-2 text-[14px] text-ink-muted">
                             <MapPin
-                                className="mt-0.5 size-4 shrink-0 text-olive"
+                                className="mt-0.5 size-4 shrink-0 text-brand"
                                 strokeWidth={1.6}
                             />
                             {form.data.address}
@@ -148,12 +148,12 @@ export function AddSheet({ open, onOpenChange }: Props) {
                     </div>
                 )}
                 {google.error && (
-                    <p className="text-[14px] text-burgundy">{google.error}</p>
+                    <p className="text-[14px] text-warm">{google.error}</p>
                 )}
 
                 {duplicates.length > 0 && (
-                    <div className="rounded-card bg-burgundy-tint p-4">
-                        <p className="mb-2 text-sm font-medium text-burgundy">
+                    <div className="rounded-card bg-warm-tint p-4">
+                        <p className="mb-2 text-sm font-medium text-warm">
                             Already in your collection?
                         </p>
                         <ul className="flex flex-col gap-1">

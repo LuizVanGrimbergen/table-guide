@@ -136,7 +136,7 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
                                     : 'Add to favourites'
                             }
                             aria-pressed={entry.favourite}
-                            className="absolute top-4 right-4 flex size-11 items-center justify-center rounded-full bg-paper/90 text-burgundy shadow-sm transition active:scale-90"
+                            className="absolute top-4 right-4 flex size-11 items-center justify-center rounded-full bg-paper/90 text-warm shadow-sm transition active:scale-90"
                         >
                             <Heart
                                 className={cn(
@@ -154,7 +154,7 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
                 <div className="px-5 pt-5 md:px-0">
                     <p
                         className="text-[13px] font-semibold tracking-wide uppercase"
-                        style={{ color: status?.color ?? '#574F46' }}
+                        style={{ color: status?.color ?? '#6B6158' }}
                     >
                         {[
                             status?.label,
@@ -308,7 +308,7 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
                                 <span
                                     className={cn(
                                         restaurant.verifyStatus !==
-                                            'verified' && 'text-burgundy',
+                                            'verified' && 'text-warm',
                                     )}
                                 >
                                     {VERIFY_LABELS[restaurant.verifyStatus] ??
@@ -485,7 +485,7 @@ function PersonalCard({
                     onPatch({ note: note || null })
                 }
                 placeholder="What to order, who to bring, what to avoid"
-                className="w-full rounded-input border border-line-strong bg-ivory/40 px-4 py-3 font-serif text-[18px] leading-snug text-espresso italic placeholder:text-stone focus:border-ink focus:outline-none"
+                className="w-full rounded-input border border-line-strong bg-ivory/40 px-4 py-3 font-serif text-[18px] leading-snug text-quote italic placeholder:text-stone focus:border-ink focus:outline-none"
             />
             <p className="mt-1 text-[13px] text-ink-muted">
                 Only you can see this. Saved when you tap away.
@@ -555,7 +555,7 @@ function MenuSheet({
                                     </span>
                                 </span>
                                 {l.maybeStale && (
-                                    <span className="rounded-full bg-burgundy-tint px-2.5 py-1 text-[12px] font-medium text-burgundy">
+                                    <span className="rounded-full bg-warm-tint px-2.5 py-1 text-[12px] font-medium text-warm">
                                         May be outdated
                                     </span>
                                 )}
@@ -577,7 +577,7 @@ function MenuSheet({
                     ))}
                 </ul>
             ) : (
-                <p className="rounded-card bg-burgundy-tint p-4 text-[15px] text-espresso">
+                <p className="rounded-card bg-warm-tint p-4 text-[15px] text-quote">
                     No menu link yet. We only show the restaurant's own menu,
                     never a guess.
                     {restaurant.website && (
@@ -689,7 +689,7 @@ function BookSheet({
                     Call {restaurant.phone}
                 </a>
             )}
-            <p className="mt-5 rounded-card bg-burgundy-tint p-4 text-[14px] text-espresso">
+            <p className="mt-5 rounded-card bg-warm-tint p-4 text-[14px] text-quote">
                 Nothing is booked until the restaurant confirms. We can't see
                 live tables yet.
             </p>
@@ -786,14 +786,14 @@ function RecommendSheet({
                                     on ? 'border-ink bg-ivory' : 'border-line',
                                 )}
                             >
-                                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-burgundy font-serif text-[17px] text-paper">
+                                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warm font-serif text-[17px] text-paper">
                                     {f.name.charAt(0)}
                                 </span>
                                 <span className="min-w-0 flex-1">
                                     <span className="flex items-center gap-2 text-[16px] font-medium">
                                         {f.name}
                                         {isMatch(f) && (
-                                            <span className="rounded-full bg-olive-tint px-2 py-0.5 text-[12px] font-semibold text-olive">
+                                            <span className="rounded-full bg-brand-tint px-2 py-0.5 text-[12px] font-semibold text-brand">
                                                 Good match
                                             </span>
                                         )}
@@ -895,7 +895,7 @@ function RecommendSheet({
                             href={`https://wa.me/?text=${encodeURIComponent(shareText(shareUrl))}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex h-[52px] items-center justify-center rounded-full bg-olive text-[15px] font-semibold text-paper"
+                            className="flex h-[52px] items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-paper"
                         >
                             Send on WhatsApp
                         </a>
@@ -1042,7 +1042,7 @@ function PlanSheet({
             >
                 Apple or Outlook (.ics file)
             </button>
-            <p className="mt-5 rounded-card bg-burgundy-tint p-4 text-[14px] text-espresso">
+            <p className="mt-5 rounded-card bg-warm-tint p-4 text-[14px] text-quote">
                 A calendar entry is not a reservation.{' '}
                 {confirmed
                     ? 'Only mark it confirmed once the restaurant has said yes.'

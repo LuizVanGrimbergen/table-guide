@@ -77,7 +77,7 @@ export function RestaurantCard({
                     <StatusBadge place={place} />
                     {place.favourite && (
                         <Heart
-                            className="size-4 text-burgundy"
+                            className="size-4 text-warm"
                             fill="currentColor"
                             strokeWidth={1.5}
                             aria-hidden
@@ -90,7 +90,7 @@ export function RestaurantCard({
                 {place.note && (
                     <p
                         className={cn(
-                            'font-serif text-[18px] leading-snug text-espresso italic',
+                            'font-serif text-[18px] leading-snug text-quote italic',
                             compact && 'line-clamp-2',
                         )}
                     >

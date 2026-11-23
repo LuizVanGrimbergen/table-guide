@@ -451,19 +451,19 @@ export function statusOf(
         return {
             key: 'not_recommended',
             label: 'Not recommended',
-            color: '#8A4B3A',
+            color: '#7A6F66',
         };
     }
 
     if (place.favourite) {
-        return { key: 'favourite', label: 'Favourite', color: '#7B2D2B' };
+        return { key: 'favourite', label: 'Favourite', color: '#8B2E3B' };
     }
 
     if (place.status === 'wish') {
-        return { key: 'wish', label: 'Wishlist', color: '#9A6A1E' };
+        return { key: 'wish', label: 'Wishlist', color: '#8A6116' };
     }
 
-    return { key: 'been', label: 'Been there', color: '#4F5A2E' };
+    return { key: 'been', label: 'Been there', color: '#3F6B4E' };
 }
 
 export function placeLine(place: Pick<Place, 'area' | 'city'>): string {
@@ -471,17 +471,14 @@ export function placeLine(place: Pick<Place, 'area' | 'city'>): string {
 }
 
 const TONES = [
-    '#B98A72',
-    '#8A7B5F',
-    '#7F8E94',
-    '#9C6B4E',
-    '#6F8792',
-    '#A39272',
-    '#5E7A80',
-    '#B79E7E',
-    '#8E6E58',
-    '#7D8A5A',
-    '#A4593F',
+    '#B5734F', // clay
+    '#C29A5B', // ochre
+    '#8A9A7B', // sage
+    '#6E8094', // slate
+    '#8B4A4F', // wine
+    '#9C7A54', // bronze
+    '#5E7563', // forest
+    '#C08B7A', // rosewood
 ];
 
 function hash(text: string): number {

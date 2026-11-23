@@ -11,7 +11,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#F6F1E8">
+    <meta name="theme-color" content="#F7F2EA">
     <meta name="robots" content="noindex">
     <title>{{ $title }}</title>
     <meta name="description" content="{{ $description }}">
@@ -35,7 +35,7 @@
     <main class="mx-auto max-w-lg px-5 pt-8 pb-12">
         <p class="font-serif text-[20px]">The Collection</p>
 
-        <p class="mt-8 text-[13px] font-semibold tracking-wide text-olive uppercase">
+        <p class="mt-8 text-[13px] font-semibold tracking-wide text-brand uppercase">
             Recommended by {{ $sender->name }}
         </p>
         <h1 class="mt-1 font-serif text-[36px] leading-tight">{{ $restaurant->name }}</h1>
@@ -44,14 +44,14 @@
         </p>
 
         @if ($rating)
-            <p class="mt-3 text-[18px] tracking-wider text-burgundy" aria-label="{{ $rating }} out of 5 stars">
+            <p class="mt-3 text-[18px] tracking-wider text-gold" aria-label="{{ $rating }} out of 5 stars">
                 {{ str_repeat('★', $rating) }}<span class="text-line-strong">{{ str_repeat('★', 5 - $rating) }}</span>
                 <span class="ml-1 align-middle text-[13px] tracking-normal text-ink-muted">{{ $sender->name }}’s rating</span>
             </p>
         @endif
 
         @if ($rec->message)
-            <blockquote class="mt-6 rounded-[16px] border border-line bg-paper p-5 font-serif text-[20px] leading-snug text-espresso italic">
+            <blockquote class="mt-6 rounded-[16px] border border-line bg-paper p-5 font-serif text-[20px] leading-snug text-quote italic">
                 “{{ $rec->message }}”
                 <footer class="mt-2 font-sans text-[14px] not-italic text-ink-muted">{{ $sender->name }}</footer>
             </blockquote>
@@ -73,7 +73,7 @@
                    class="flex h-[52px] items-center justify-center gap-2 rounded-full border border-line-strong bg-paper text-[15px] font-semibold">
                     {{ $menuKinds[$link->kind->value] ?? 'Menu' }}
                     @if ($link->maybe_stale)
-                        <span class="text-[12px] font-medium text-burgundy">may be outdated</span>
+                        <span class="text-[12px] font-medium text-warm">may be outdated</span>
                     @endif
                 </a>
             @endforeach
@@ -83,7 +83,7 @@
             @if ($viewer)
                 <form method="POST" action="{{ route('recommendations.public.save', $rec->public_token) }}">
                     @csrf
-                    <button type="submit" class="h-12 w-full rounded-full bg-olive text-[15px] font-semibold text-paper">
+                    <button type="submit" class="h-12 w-full rounded-full bg-brand text-[15px] font-semibold text-paper">
                         Save to my wishlist
                     </button>
                 </form>
@@ -93,7 +93,7 @@
                     Save this place to your wishlist and keep track of where you've been.
                 </p>
                 <a href="{{ route('recommendations.public.save', $rec->public_token) }}"
-                   class="mt-4 flex h-12 items-center justify-center rounded-full bg-olive text-[15px] font-semibold text-paper">
+                   class="mt-4 flex h-12 items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-paper">
                     Save to my wishlist
                 </a>
             @endif

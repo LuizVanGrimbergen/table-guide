@@ -37,23 +37,23 @@ const CHIPS: { key: StatusFilter; label: string }[] = [
     { key: 'fav', label: 'Favourites' },
 ];
 
-/** Pin colours: olive been, outlined burgundy wishlist, burgundy favourite, grey not recommended. */
+/** Pin colours: green been, outlined ochre wishlist, wine favourite, grey not recommended. */
 function pinStyle(place: Place): { bg: string; fg: string; border: string } {
     const status = statusOf(place).key;
 
     if (status === 'not_recommended') {
-        return { bg: '#A69B8C', fg: '#FFFDF9', border: '#FFFDF9' };
+        return { bg: '#A79C90', fg: '#FFFDF9', border: '#FFFDF9' };
     }
 
     if (status === 'favourite') {
-        return { bg: '#7B2D2B', fg: '#FFFDF9', border: '#FFFDF9' };
+        return { bg: '#8B2E3B', fg: '#FFFDF9', border: '#FFFDF9' };
     }
 
     if (status === 'wish') {
-        return { bg: '#FFFDF9', fg: '#7B2D2B', border: '#7B2D2B' };
+        return { bg: '#FFFDF9', fg: '#8A6116', border: '#C29A5B' };
     }
 
-    return { bg: '#4F5A2E', fg: '#FFFDF9', border: '#FFFDF9' };
+    return { bg: '#3F6B4E', fg: '#FFFDF9', border: '#FFFDF9' };
 }
 
 export default function MapPage({ places, homeCity, mapId, cities }: Props) {
@@ -186,11 +186,11 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
                                                 c.key === 'wish'
                                                     ? '#FFFDF9'
                                                     : c.key === 'fav'
-                                                      ? '#7B2D2B'
-                                                      : '#4F5A2E',
+                                                      ? '#8B2E3B'
+                                                      : '#3F6B4E',
                                             borderColor:
                                                 c.key === 'wish'
-                                                    ? '#7B2D2B'
+                                                    ? '#C29A5B'
                                                     : 'transparent',
                                         }}
                                     />
@@ -221,7 +221,7 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
                                 {placeLine(selected)}
                             </p>
                             {selected.note && (
-                                <p className="mt-1.5 line-clamp-2 font-serif text-[17px] text-espresso italic">
+                                <p className="mt-1.5 line-clamp-2 font-serif text-[17px] text-quote italic">
                                     {selected.note}
                                 </p>
                             )}
@@ -262,7 +262,7 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
                     <span
                         className={cn(
                             'relative h-[26px] w-11 shrink-0 rounded-full transition',
-                            hideNotRecommended ? 'bg-olive' : 'bg-line-strong',
+                            hideNotRecommended ? 'bg-brand' : 'bg-line-strong',
                         )}
                     >
                         <span
