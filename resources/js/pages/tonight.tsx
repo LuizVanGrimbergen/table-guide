@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BottomSheet } from '@/components/tc/bottom-sheet';
 import { TonightHelper } from '@/components/tc/tonight-helper';
 import type { OccasionKey, Place } from '@/lib/collection';
@@ -17,10 +17,30 @@ type Props = { places: Place[]; homeCity: string; aiEnabled: boolean };
 
 const GUESTS = [2, 3, 4, 5, 6, 8];
 
+/** Remembers the last kind of evening on this device. */
+const MOOD_KEY = 'tc.tonight.mood';
+
+/** An evening default: business lunch made no sense for "Dinner tonight". */
+const DEFAULT_MOOD: OccasionKey = 'casual';
+
 export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
     const [guests, setGuests] = useState(4);
-    const [mood, setMood] = useState<OccasionKey>('business_lunch');
+    const [mood, setMood] = useState<OccasionKey>(DEFAULT_MOOD);
     const [booking, setBooking] = useState<Place | null>(null);
+
+    // Read after load, not during render, so the server and browser agree.
+    useEffect(() => {
+        const saved = localStorage.getItem(MOOD_KEY);
+
+        if (saved && MOODS.some((m) => m.occasion === saved)) {
+            setMood(saved as OccasionKey);
+        }
+    }, []);
+
+    const chooseMood = (next: OccasionKey) => {
+        setMood(next);
+        localStorage.setItem(MOOD_KEY, next);
+    };
     const picks = tonightPicks(places, homeCity, mood, guests);
     const all = tonightCandidates(places, homeCity, mood).length;
     const today = new Date().toLocaleDateString('en-AU', {
@@ -103,7 +123,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                     type="button"
                                     role="radio"
                                     aria-checked={on}
-                                    onClick={() => setMood(m.occasion)}
+                                    onClick={() => chooseMood(m.occasion)}
                                     className={cn(
                                         'flex min-h-16 items-center gap-3 rounded-card border px-4 py-2.5 text-left transition duration-120 active:scale-[.98]',
                                         on
