@@ -30,7 +30,7 @@ Hero image, heart (favourite), kicker (status · occasion), name, area, tags. Fo
 
 ## Tonight ("Dinner tonight")
 - Date line, title.
-- "How many people?": six large buttons 2, 3, 4, 5, 6, 8+.
+- "How many people?": seven large buttons 1, 2, 3, 4, 5, 6, 8+ (dinner alone counts).
 - "What kind of evening?": five large rows with hint and count: Business or clients, Something special, Easy and relaxed, Close to home, Just drinks. Starts on Easy and relaxed, then remembers the last choice on that device.
 - "Your top picks": top 5 from their own Sydney places that are Been there and not "not recommended". Ranking: favourite +2, good for groups +3 when 6 or more guests, has a note +1. Each pick: rank number, name, area, note, buttons Book a table and Directions (Google Maps directions URL).
 - "See all N in the Collection".

@@ -15,7 +15,15 @@ import { cn } from '@/lib/utils';
 
 type Props = { places: Place[]; homeCity: string; aiEnabled: boolean };
 
-const GUESTS = [2, 3, 4, 5, 6, 8];
+const GUESTS = [1, 2, 3, 4, 5, 6, 8];
+
+function peopleLabel(n: number): string {
+    if (n === 1) {
+        return 'Just me';
+    }
+
+    return n === 8 ? '8 or more people' : `${n} people`;
+}
 
 /** Remembers the last kind of evening on this device. */
 const MOOD_KEY = 'tc.tonight.mood';
@@ -64,7 +72,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                         How many people?
                     </h2>
                     <div
-                        className="grid grid-cols-6 gap-2"
+                        className="grid grid-cols-7 gap-1.5"
                         role="radiogroup"
                         aria-label="Number of people"
                     >
@@ -74,9 +82,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                 type="button"
                                 role="radio"
                                 aria-checked={guests === n}
-                                aria-label={
-                                    n === 8 ? '8 or more people' : `${n} people`
-                                }
+                                aria-label={peopleLabel(n)}
                                 onClick={() => setGuests(n)}
                                 className={cn(
                                     'h-[52px] rounded-[14px] border font-serif text-[22px] transition duration-120 active:scale-96',
@@ -250,7 +256,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                 title="Book a Table"
                 description={
                     booking
-                        ? `${booking.name} · ${guests === 8 ? '8+' : guests} people`
+                        ? `${booking.name} · ${guests === 1 ? 'just you' : guests === 8 ? '8+ people' : `${guests} people`}`
                         : undefined
                 }
             >
