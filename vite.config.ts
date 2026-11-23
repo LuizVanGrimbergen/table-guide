@@ -13,8 +13,12 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
+                bunny('Inter', {
                     weights: [400, 500, 600],
+                }),
+                bunny('Newsreader', {
+                    weights: [400],
+                    styles: ['normal', 'italic'],
                 }),
             ],
         }),
@@ -50,6 +54,7 @@ export default defineConfig({
             'resources/js/components/ui/*',
             'resources/js/routes/**',
             'resources/js/wayfinder/**',
+            'reference/**',
         ],
         options: {
             denyWarnings: true,
@@ -68,6 +73,9 @@ export default defineConfig({
             'composer.json',
             'resources/js/components/ui/*',
             'resources/views/mail/*',
+            'data/**',
+            'docs/**',
+            'reference/**',
         ],
         sortTailwindcss: {
             functions: ['clsx', 'cn', 'cva'],
