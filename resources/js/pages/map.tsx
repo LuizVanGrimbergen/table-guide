@@ -1,22 +1,30 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     AdvancedMarker,
     APIProvider,
+    Circle,
     Map as GoogleMap,
     useMap,
 } from '@vis.gl/react-google-maps';
-import { LocateFixed, MapPinOff, SlidersHorizontal, X } from 'lucide-react';
+import { LocateFixed, MapPinOff } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { BottomSheet } from '@/components/tc/bottom-sheet';
-import { ChoiceRow } from '@/components/tc/choice-row';
-import { RestaurantRow, StatusBadge } from '@/components/tc/restaurant-card';
-import type { Place, StatusFilter } from '@/lib/collection';
 import {
-    directionsUrl,
-    matchesStatus,
-    placeLine,
+    activeLabels,
+    FilterBar,
+    FilterSummary,
+} from '@/components/tc/filter-bar';
+import { MapPin } from '@/components/tc/map-pin';
+import { PlaceCarousel } from '@/components/tc/place-carousel';
+import { RestaurantRow } from '@/components/tc/restaurant-card';
+import type { Filters, LatLng, Place } from '@/lib/collection';
+import {
+    defaultFilters,
+    distanceKm,
+    filterPlaces,
     statusOf,
 } from '@/lib/collection';
+import type { Cluster } from '@/lib/cluster';
+import { boundsOf, clusterPlaces } from '@/lib/cluster';
 import { cn } from '@/lib/utils';
 
 type City = { lat: number; lng: number };
@@ -30,54 +38,135 @@ type Props = {
 
 const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY as string | undefined;
 
-const CHIPS: { key: StatusFilter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'been', label: 'Been there' },
-    { key: 'wish', label: 'Wishlist' },
-    { key: 'fav', label: 'Favourites' },
-];
+const CAN_LOCATE =
+    typeof navigator !== 'undefined' && 'geolocation' in navigator;
 
-/** Pin colours: green been, outlined ochre wishlist, wine favourite, grey not recommended. */
-function pinStyle(place: Place): { bg: string; fg: string; border: string } {
-    const status = statusOf(place).key;
-
-    if (status === 'not_recommended') {
-        return { bg: '#A79C90', fg: '#FFFDF9', border: '#FFFDF9' };
+/** Sort weight for the cards when distance is unknown. */
+function rank(p: Place): number {
+    if (p.notRecommended) {
+        return 3;
     }
 
-    if (status === 'favourite') {
-        return { bg: '#8B2E3B', fg: '#FFFDF9', border: '#FFFDF9' };
+    if (p.favourite) {
+        return 0;
     }
 
-    if (status === 'wish') {
-        return { bg: '#FFFDF9', fg: '#8A6116', border: '#C29A5B' };
-    }
-
-    return { bg: '#3F6B4E', fg: '#FFFDF9', border: '#FFFDF9' };
+    return p.status === 'been' ? 1 : 2;
 }
 
-export default function MapPage({ places, homeCity, mapId, cities }: Props) {
-    const [city, setCity] = useState(homeCity);
-    const [status, setStatus] = useState<StatusFilter>('all');
-    const [hideNotRecommended, setHideNotRecommended] = useState(false);
-    const [selected, setSelected] = useState<Place | null>(null);
-    const [filtersOpen, setFiltersOpen] = useState(false);
-
-    const inCity = useMemo(
-        () =>
-            places.filter(
-                (p) =>
-                    p.city === city &&
-                    matchesStatus(p, status) &&
-                    !(hideNotRecommended && p.notRecommended),
-            ),
-        [places, city, status, hideNotRecommended],
+export default function MapPage({
+    places,
+    homeCity,
+    mapId,
+    cities,
+}: Props) {
+    const [filters, setFilters] = useState<Filters>(() =>
+        defaultFilters(homeCity),
     );
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [maxKm, setMaxKm] = useState<number | null>(null);
+    const [zoom, setZoom] = useState(12);
+    // Set when a swipe lands on a card, so the map follows along.
+    const [panTo, setPanTo] = useState<{ to: LatLng; n: number } | null>(
+        null,
+    );
+
+    // Live location: asked for only when he taps "Use my location" or the
+    // locate button, never on page load, and never sent to the server.
+    const [me, setMe] = useState<LatLng | null>(null);
+    const [locating, setLocating] = useState(false);
+    const [locateFailed, setLocateFailed] = useState(false);
+
+    const locate = (then?: (pos: LatLng) => void) => {
+        if (!CAN_LOCATE) {
+            setLocateFailed(true);
+
+            return;
+        }
+
+        setLocating(true);
+        setLocateFailed(false);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const here = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                };
+                setMe(here);
+                setLocating(false);
+                then?.(here);
+            },
+            () => {
+                setLocating(false);
+                setLocateFailed(true);
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+        );
+    };
+
+    const kmAway = (p: Place): number | null =>
+        me && p.lat !== null && p.lng !== null
+            ? distanceKm(me, { lat: p.lat, lng: p.lng })
+            : null;
+    const within = (p: Place, km: number) => {
+        const d = kmAway(p);
+
+        return d !== null && d <= km;
+    };
+
+    const update = (patch: Partial<Filters>) => {
+        setFilters((f) => ({ ...f, ...patch }));
+        setSelectedId(null);
+    };
+    const clearAll = () => {
+        setFilters(defaultFilters(homeCity));
+        setMaxKm(null);
+        setSelectedId(null);
+    };
+
+    const city = filters.city;
+    const cityPlaces = useMemo(
+        () => places.filter((p) => p.city === city),
+        [places, city],
+    );
+    const filtered = useMemo(
+        () => filterPlaces(places, filters),
+        [places, filters],
+    );
+    const activeKm = me ? maxKm : null;
+    const inCity =
+        activeKm === null
+            ? filtered
+            : filtered.filter((p) => within(p, activeKm));
     const pinned = inCity.filter((p) => p.lat !== null && p.lng !== null);
-    const cityNames = [...new Set(places.map((p) => p.city))].sort();
+
+    // Card order: nearest first when we know where he is, otherwise his
+    // favourites first, then places he has been, then the wishlist.
+    const ordered = [...pinned].sort((a, b) => {
+        const da = kmAway(a);
+        const db = kmAway(b);
+
+        if (da !== null && db !== null) {
+            return da - db;
+        }
+
+        return rank(a) - rank(b) || a.name.localeCompare(b.name);
+    });
+    const { singles, clusters } = useMemo(
+        () => clusterPlaces(ordered, Math.round(zoom), selectedId),
+        // Recluster only when the pins, zoom level or selection change.
+        [ordered.map((p) => p.id).join(','), Math.round(zoom), selectedId],
+    );
+
     const centre = cities[city] ??
         cities[homeCity] ?? { lat: -33.8688, lng: 151.2093 };
-    const canShowMap = !!MAPS_KEY && pinned.length > 0;
+    // Show the map as soon as the city has any located places, so a filter
+    // with no matches shows an empty map with a reset, not the fallback.
+    const canShowMap =
+        !!MAPS_KEY && cityPlaces.some((p) => p.lat !== null && p.lng !== null);
+    const pinKey = `${pinned.map((p) => p.id).join(',')}|${activeKm ?? ''}`;
+    const showCards = canShowMap && ordered.length > 0;
+    const labels = activeLabels(filters, homeCity, activeKm);
 
     return (
         <>
@@ -93,216 +182,322 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
                             gestureHandling="greedy"
                             disableDefaultUI
                             clickableIcons={false}
-                            onClick={() => setSelected(null)}
+                            onClick={() => setSelectedId(null)}
+                            onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
                             className="size-full"
                         >
-                            {pinned.map((p) => {
-                                const s = pinStyle(p);
-                                const on = selected?.id === p.id;
+                            {singles.map((p) => {
+                                const on = p.id === selectedId;
 
                                 return (
                                     <AdvancedMarker
                                         key={p.id}
                                         position={{ lat: p.lat!, lng: p.lng! }}
                                         title={`${p.name}, ${statusOf(p).label}`}
-                                        zIndex={on ? 10 : 1}
-                                        onClick={() => setSelected(p)}
+                                        zIndex={on ? 1000 : p.favourite ? 2 : 1}
+                                        onClick={() => setSelectedId(p.id)}
                                     >
-                                        <span
-                                            className="flex items-center justify-center rounded-full font-serif italic shadow-[0_2px_6px_rgba(30,27,24,0.3)] transition-all"
-                                            style={{
-                                                width: on ? 38 : 28,
-                                                height: on ? 38 : 28,
-                                                background: s.bg,
-                                                color: s.fg,
-                                                border: `2px solid ${s.border}`,
-                                                fontSize: on ? 19 : 15,
-                                            }}
-                                        >
-                                            {p.name.charAt(0)}
-                                        </span>
+                                        <MapPin place={p} on={on} />
                                     </AdvancedMarker>
                                 );
                             })}
-                            <LocateButton />
+                            {clusters.map((c) => (
+                                <ClusterMarker key={c.key} cluster={c} />
+                            ))}
+                            {me && (
+                                <AdvancedMarker
+                                    position={me}
+                                    title="You are here"
+                                    zIndex={999}
+                                    anchorPoint={['50%', '50%']}
+                                >
+                                    <span className="relative flex size-6 items-center justify-center">
+                                        <span className="absolute inset-0 animate-ping rounded-full bg-brand/30" />
+                                        <span className="size-4 rounded-full border-[3px] border-paper bg-brand shadow-[0_1px_4px_rgba(30,27,24,0.4)]" />
+                                    </span>
+                                </AdvancedMarker>
+                            )}
+                            {me && activeKm !== null && (
+                                <Circle
+                                    center={me}
+                                    radius={activeKm * 1000}
+                                    clickable={false}
+                                    strokeColor="#A0522D"
+                                    strokeOpacity={0.7}
+                                    strokeWeight={1.5}
+                                    fillColor="#A0522D"
+                                    fillOpacity={0.06}
+                                />
+                            )}
+                            <FitToPins
+                                places={pinned}
+                                pinKey={pinKey}
+                                centre={activeKm !== null ? me : null}
+                                radiusKm={activeKm}
+                            />
+                            <FollowSwipe request={panTo} />
+                            <LocateButton
+                                busy={locating}
+                                raised={showCards}
+                                onLocate={locate}
+                            />
                         </GoogleMap>
                     </APIProvider>
                 ) : (
                     <MapFallback places={inCity} missingKey={!MAPS_KEY} />
                 )}
 
-                {/* Top overlay */}
+                {/* Top: the same four pills as the Collection, and one line
+                    saying what is showing */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 px-4 pt-[max(12px,env(safe-area-inset-top))]">
-                    <div className="pointer-events-auto flex items-center gap-2">
-                        <div className="flex-1 rounded-full bg-paper/95 px-4 py-2 shadow-[0_2px_8px_rgba(30,27,24,0.12)]">
-                            <p className="font-serif text-[20px] leading-tight">
-                                {city}
-                            </p>
-                            <p className="text-[13px] text-ink-muted">
-                                {pinned.length} on map
-                                {inCity.length > pinned.length &&
-                                    ` · ${inCity.length - pinned.length} not located yet`}
-                            </p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => setFiltersOpen(true)}
-                            className={cn(
-                                'flex h-11 items-center gap-1.5 rounded-full px-4 text-[15px] font-semibold shadow-[0_2px_8px_rgba(30,27,24,0.12)] transition active:scale-96',
-                                city !== homeCity || hideNotRecommended
-                                    ? 'bg-ink text-paper'
-                                    : 'bg-paper text-ink',
-                            )}
-                        >
-                            <SlidersHorizontal
-                                className="size-4"
-                                strokeWidth={1.8}
-                            />
-                            Filters
-                        </button>
+                    <div className="pointer-events-auto">
+                        <FilterBar
+                            places={places}
+                            filters={filters}
+                            homeCity={homeCity}
+                            onChange={update}
+                            resultCount={pinned.length}
+                            allowAllCities={false}
+                            floating
+                            near={
+                                CAN_LOCATE
+                                    ? {
+                                          me,
+                                          km: activeKm,
+                                          locating,
+                                          failed: locateFailed,
+                                          locate: () => locate(),
+                                          setKm: (km) => {
+                                              setMaxKm(km);
+                                              setSelectedId(null);
+                                          },
+                                          within,
+                                      }
+                                    : undefined
+                            }
+                        />
                     </div>
-                    <div className="pointer-events-auto -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-2">
-                        {CHIPS.map((c) => (
-                            <button
-                                key={c.key}
-                                type="button"
-                                aria-pressed={status === c.key}
-                                onClick={() => {
-                                    setStatus(c.key);
-                                    setSelected(null);
-                                }}
-                                className={cn(
-                                    'flex h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-[14px] font-medium shadow-[0_2px_8px_rgba(30,27,24,0.12)] transition active:scale-96',
-                                    status === c.key
-                                        ? 'border-ink bg-ink text-paper'
-                                        : 'border-paper bg-paper text-ink',
-                                )}
-                            >
-                                {c.key !== 'all' && (
-                                    <span
-                                        className="size-2.5 rounded-full border-[1.5px]"
-                                        style={{
-                                            background:
-                                                c.key === 'wish'
-                                                    ? '#FFFDF9'
-                                                    : c.key === 'fav'
-                                                      ? '#8B2E3B'
-                                                      : '#3F6B4E',
-                                            borderColor:
-                                                c.key === 'wish'
-                                                    ? '#C29A5B'
-                                                    : 'transparent',
-                                        }}
-                                    />
-                                )}
-                                {c.label}
-                            </button>
-                        ))}
-                    </div>
+                    <FilterSummary
+                        className="pointer-events-auto mt-2 inline-flex max-w-full rounded-full bg-paper/95 pr-1 pl-4 shadow-[0_2px_8px_rgba(30,27,24,0.14)] backdrop-blur"
+                        count={pinned.length}
+                        labels={labels}
+                        onClear={clearAll}
+                    />
                 </div>
 
-                {/* Selected pin card */}
-                {selected && (
-                    <div className="absolute inset-x-0 bottom-0 p-4">
-                        <div className="relative mx-auto max-w-md rounded-card border border-line bg-paper p-4 shadow-[0_8px_24px_rgba(30,27,24,0.18)]">
+                {/* Bottom: swipe through the places on the map */}
+                {showCards && (
+                    <div className="absolute inset-x-0 bottom-0">
+                        <PlaceCarousel
+                            places={ordered}
+                            selectedId={selectedId}
+                            kmAway={kmAway}
+                            onSwipeTo={(p) => {
+                                setSelectedId(p.id);
+                                setPanTo((cur) => ({
+                                    to: { lat: p.lat!, lng: p.lng! },
+                                    n: (cur?.n ?? 0) + 1,
+                                }));
+                            }}
+                        />
+                    </div>
+                )}
+
+                {/* Nothing matches */}
+                {canShowMap && pinned.length === 0 && (
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4">
+                        <div className="pointer-events-auto mx-auto max-w-md rounded-card border border-line bg-paper p-5 text-center shadow-[0_8px_24px_rgba(30,27,24,0.18)]">
+                            <p className="font-serif text-[20px]">
+                                No places match these filters
+                            </p>
                             <button
                                 type="button"
-                                aria-label="Close"
-                                onClick={() => setSelected(null)}
-                                className="absolute top-1 right-1 flex size-11 items-center justify-center text-ink-muted"
+                                onClick={clearAll}
+                                className="mt-3 h-11 rounded-full bg-brand px-6 text-[15px] font-semibold text-paper"
                             >
-                                <X className="size-5" strokeWidth={1.6} />
+                                Show all places
                             </button>
-                            <StatusBadge place={selected} />
-                            <p className="mt-1 pr-8 font-serif text-[23px] leading-tight">
-                                {selected.name}
-                            </p>
-                            <p className="text-sm text-ink-muted">
-                                {placeLine(selected)}
-                            </p>
-                            {selected.note && (
-                                <p className="mt-1.5 line-clamp-2 font-serif text-[17px] text-quote italic">
-                                    {selected.note}
-                                </p>
-                            )}
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                                <a
-                                    href={directionsUrl(selected)}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="flex h-12 items-center justify-center rounded-full border border-ink text-[15px] font-semibold"
-                                >
-                                    Directions
-                                </a>
-                                <Link
-                                    href={`/restaurants/${selected.restaurantId}`}
-                                    className="flex h-12 items-center justify-center rounded-full bg-ink text-[15px] font-semibold text-paper"
-                                >
-                                    Details
-                                </Link>
-                            </div>
                         </div>
                     </div>
                 )}
             </div>
-
-            <BottomSheet
-                open={filtersOpen}
-                onOpenChange={setFiltersOpen}
-                title="Map filters"
-            >
-                <button
-                    type="button"
-                    role="switch"
-                    aria-checked={hideNotRecommended}
-                    onClick={() => setHideNotRecommended((v) => !v)}
-                    className="flex min-h-[58px] w-full items-center justify-between gap-3 border-b border-line text-left text-[17px]"
-                >
-                    Hide places I don't recommend
-                    <span
-                        className={cn(
-                            'relative h-[26px] w-11 shrink-0 rounded-full transition',
-                            hideNotRecommended ? 'bg-brand' : 'bg-line-strong',
-                        )}
-                    >
-                        <span
-                            className={cn(
-                                'absolute top-[3px] size-5 rounded-full bg-paper transition-all',
-                                hideNotRecommended
-                                    ? 'left-[21px]'
-                                    : 'left-[3px]',
-                            )}
-                        />
-                    </span>
-                </button>
-                <h3 className="mt-5 mb-1 text-[13px] font-semibold tracking-wide text-ink-muted uppercase">
-                    City
-                </h3>
-                {cityNames.map((c) => (
-                    <ChoiceRow
-                        key={c}
-                        label={c}
-                        count={places.filter((p) => p.city === c).length}
-                        on={city === c}
-                        onChoose={() => {
-                            setCity(c);
-                            setSelected(null);
-                            setFiltersOpen(false);
-                        }}
-                    />
-                ))}
-            </BottomSheet>
         </>
     );
 }
 
-function LocateButton() {
+/**
+ * Zooms the map to fit the visible pins whenever the filters change (not when
+ * a pin is selected). One pin: centre on it at street level.
+ */
+function FitToPins({
+    places,
+    pinKey,
+    centre,
+    radiusKm,
+}: {
+    places: Place[];
+    pinKey: string;
+    centre: LatLng | null;
+    radiusKm: number | null;
+}) {
     const map = useMap();
-    const [busy, setBusy] = useState(false);
 
-    useEffect(() => () => setBusy(false), []);
+    useEffect(() => {
+        if (!map) {
+            return;
+        }
 
-    if (!('geolocation' in navigator)) {
+        // With a distance filter on, show the whole circle around you.
+        const points: LatLng[] =
+            centre && radiusKm !== null
+                ? [
+                      { lat: centre.lat + radiusKm / 111, lng: centre.lng },
+                      { lat: centre.lat - radiusKm / 111, lng: centre.lng },
+                      {
+                          lat: centre.lat,
+                          lng:
+                              centre.lng +
+                              radiusKm /
+                                  (111 * Math.cos((centre.lat * Math.PI) / 180)),
+                      },
+                      {
+                          lat: centre.lat,
+                          lng:
+                              centre.lng -
+                              radiusKm /
+                                  (111 * Math.cos((centre.lat * Math.PI) / 180)),
+                      },
+                  ]
+                : places.map((p) => ({ lat: p.lat!, lng: p.lng! }));
+
+        if (points.length === 0) {
+            return;
+        }
+
+        if (points.length === 1) {
+            map.panTo(points[0]);
+            map.setZoom(15);
+
+            return;
+        }
+
+        const lats = points.map((p) => p.lat);
+        const lngs = points.map((p) => p.lng);
+        map.fitBounds(
+            {
+                north: Math.max(...lats),
+                south: Math.min(...lats),
+                east: Math.max(...lngs),
+                west: Math.min(...lngs),
+            },
+            { top: 190, bottom: 150, left: 40, right: 40 },
+        );
+        // Only refit when the set of pins changes, not on every render.
+    }, [map, pinKey]);
+
+    return null;
+}
+
+/** Numbered bubble for pins that sit too close together; tap to zoom in. */
+function ClusterMarker({ cluster }: { cluster: Cluster<Place> }) {
+    const map = useMap();
+    const n = cluster.items.length;
+    const size = n < 10 ? 36 : n < 25 ? 42 : 48;
+    const favs = cluster.items.filter((p) => p.favourite).length;
+
+    return (
+        <AdvancedMarker
+            position={cluster.centre}
+            title={`${n} places, tap to zoom in`}
+            zIndex={5}
+            anchorPoint={['50%', '50%']}
+            onClick={() => {
+                if (!map) {
+                    return;
+                }
+
+                const b = boundsOf(
+                    cluster.items.map((p) => ({ lat: p.lat!, lng: p.lng! })),
+                );
+
+                if (b.north - b.south < 0.0005 && b.east - b.west < 0.0005) {
+                    map.panTo(cluster.centre);
+                    map.setZoom((map.getZoom() ?? 12) + 3);
+                } else {
+                    map.fitBounds(b, {
+                        top: 190,
+                        bottom: 170,
+                        left: 50,
+                        right: 50,
+                    });
+                }
+            }}
+        >
+            <span
+                className="flex items-center justify-center rounded-full border-2 border-brand bg-paper font-semibold text-brand tabular-nums shadow-[0_2px_8px_rgba(30,27,24,0.25)] transition-transform active:scale-90"
+                style={{
+                    width: size,
+                    height: size,
+                    fontSize: n < 100 ? 15 : 13,
+                    // A wine ring when the group holds favourites.
+                    boxShadow: favs
+                        ? '0 0 0 2px #FFFDF9, 0 0 0 4px #8B2E3B, 0 2px 8px rgba(30,27,24,0.25)'
+                        : undefined,
+                }}
+            >
+                {n}
+            </span>
+        </AdvancedMarker>
+    );
+}
+
+/** Pans to the card he swiped to, unless that pin is already well in view. */
+function FollowSwipe({ request }: { request: { to: LatLng; n: number } | null }) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map || !request) {
+            return;
+        }
+
+        const bounds = map.getBounds();
+
+        if (bounds) {
+            const ne = bounds.getNorthEast();
+            const sw = bounds.getSouthWest();
+            const latPad = (ne.lat() - sw.lat()) * 0.25;
+            const lngPad = (ne.lng() - sw.lng()) * 0.15;
+            const { lat, lng } = request.to;
+            const comfortable =
+                lat < ne.lat() - latPad * 0.6 &&
+                lat > sw.lat() + latPad &&
+                lng < ne.lng() - lngPad &&
+                lng > sw.lng() + lngPad;
+
+            if (comfortable) {
+                return;
+            }
+        }
+
+        map.panTo(request.to);
+        // Only when a new swipe asks for it.
+    }, [map, request?.n]);
+
+    return null;
+}
+
+function LocateButton({
+    busy,
+    raised,
+    onLocate,
+}: {
+    busy: boolean;
+    raised: boolean;
+    onLocate: (then?: (pos: LatLng) => void) => void;
+}) {
+    const map = useMap();
+
+    if (!CAN_LOCATE) {
         return null;
     }
 
@@ -311,22 +506,18 @@ function LocateButton() {
             type="button"
             aria-label="Show where I am"
             disabled={busy}
-            onClick={() => {
-                setBusy(true);
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        map?.panTo({
-                            lat: pos.coords.latitude,
-                            lng: pos.coords.longitude,
-                        });
-                        map?.setZoom(14);
-                        setBusy(false);
-                    },
-                    () => setBusy(false),
-                    { enableHighAccuracy: false, timeout: 10000 },
-                );
-            }}
-            className="absolute right-4 bottom-[max(24px,env(safe-area-inset-bottom))] flex size-12 items-center justify-center rounded-full bg-paper text-ink shadow-[0_2px_8px_rgba(30,27,24,0.2)] transition active:scale-96 disabled:opacity-60"
+            onClick={() =>
+                onLocate((pos) => {
+                    map?.panTo(pos);
+                    map?.setZoom(14);
+                })
+            }
+            className={cn(
+                'absolute right-4 flex size-12 items-center justify-center rounded-full bg-paper text-ink shadow-[0_2px_8px_rgba(30,27,24,0.2)] transition-[bottom,transform] active:scale-96 disabled:opacity-60',
+                raised
+                    ? 'bottom-[136px]'
+                    : 'bottom-[max(24px,env(safe-area-inset-bottom))]',
+            )}
         >
             <LocateFixed className="size-5" strokeWidth={1.6} />
         </button>
