@@ -41,6 +41,10 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'toast' => fn () => $request->session()->get('toast'),
+            'shareUrl' => fn () => $request->session()->get('shareUrl'),
+            'placesSearch' => fn () => filled(config('services.google.places_server_key')),
+            'devLogin' => app()->isLocal() && filled(config('collection.dev_login_email')),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
