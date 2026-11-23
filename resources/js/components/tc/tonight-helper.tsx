@@ -241,9 +241,11 @@ export function TonightHelper({
                                     <p className="mt-3 text-[15px] font-semibold text-olive">
                                         {p.headline}
                                     </p>
-                                    <p className="mt-0.5 text-[15px] leading-snug">
-                                        {p.why}
-                                    </p>
+                                    {p.why && (
+                                        <p className="mt-0.5 text-[15px] leading-snug">
+                                            {p.why}
+                                        </p>
+                                    )}
                                     <div className="mt-3 grid grid-cols-2 gap-2">
                                         <a
                                             href={bookingUrl(p).url}

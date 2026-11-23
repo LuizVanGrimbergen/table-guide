@@ -60,8 +60,9 @@ test('without AI, the rules pick his best matching places and say why', function
 
     expect($response->json('source'))->toBe('rules')
         ->and($response->json('picks.0.name'))->toBe('Pilu')
-        ->and($response->json('picks.0.why'))->toContain('favourites')
+        ->and($response->json('picks.0.headline'))->toBe('One of your favourites')
         ->and($response->json('picks.0.why'))->toContain('Italian, as you asked')
+        ->and($response->json('picks.0.why'))->not->toContain('One of your favourites')
         ->and(collect($response->json('picks'))->pluck('name'))->toContain('Grappa');
 });
 
@@ -77,8 +78,8 @@ test('"somewhere new" puts his wishlist first, with who recommended it', functio
     $response = ask(['mood' => 'new', 'cuisine' => 'Italian']);
 
     expect($response->json('picks.0.name'))->toBe('New Trattoria')
-        ->and($response->json('picks.0.why'))->toContain('tip from Luiz')
-        ->and($response->json('picks.0.why'))->toContain('Your note mentions Italian');
+        ->and($response->json('picks.0.headline').' '.$response->json('picks.0.why'))->toContain('tip from Luiz')
+        ->and($response->json('picks.0.headline').' '.$response->json('picks.0.why'))->toContain('Your note mentions Italian');
 });
 
 test('clients lifts places he keeps for business', function () {

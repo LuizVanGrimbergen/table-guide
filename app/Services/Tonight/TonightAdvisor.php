@@ -64,8 +64,11 @@ class TonightAdvisor
             'intro' => $this->rulesIntro($answers),
             'picks' => array_map(fn (array $p) => [
                 ...$p,
+                // The first reason becomes the headline; the rest explain it.
                 'headline' => $p['reasons'][0] ?? 'One of your places',
-                'why' => implode('. ', array_slice($p['reasons'], 0, 3)).'.',
+                'why' => count($p['reasons']) > 1
+                    ? implode('. ', array_slice($p['reasons'], 1, 3)).'.'
+                    : '',
             ], array_slice($shortlist, 0, 3)),
         ];
     }
