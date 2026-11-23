@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#F6F1E8" />
+        <title>Offline · The Collection</title>
+        <style>
+            body {
+                margin: 0;
+                min-height: 100dvh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f6f1e8;
+                color: #1e1b18;
+                font:
+                    16px/1.5 -apple-system,
+                    system-ui,
+                    sans-serif;
+                text-align: center;
+                padding: 24px;
+                box-sizing: border-box;
+            }
+            h1 {
+                font:
+                    400 30px/1.2 Georgia,
+                    serif;
+                margin: 0 0 8px;
+            }
+            p {
+                color: #574f46;
+                margin: 0 0 24px;
+                max-width: 320px;
+            }
+            button {
+                height: 52px;
+                padding: 0 28px;
+                border: 0;
+                border-radius: 26px;
+                background: #1e1b18;
+                color: #fffdf9;
+                font:
+                    600 15px system-ui,
+                    sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>You're offline</h1>
+            <p>
+                Pages you've opened before still work. Open the app again when
+                you're back online to see everything.
+            </p>
+            <button type="button" onclick="location.reload()">Try again</button>
+        </div>
+    </body>
+</html>
