@@ -43,7 +43,10 @@ class CollectionController extends Controller
 
     public function tonight(Request $request): Response
     {
-        return Inertia::render('tonight', $this->shared($request));
+        return Inertia::render('tonight', [
+            ...$this->shared($request),
+            'aiEnabled' => filled(config('services.anthropic.key')),
+        ]);
     }
 
     /** @return array<string, mixed> */

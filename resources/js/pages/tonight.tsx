@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/tc/bottom-sheet';
+import { TonightHelper } from '@/components/tc/tonight-helper';
 import type { OccasionKey, Place } from '@/lib/collection';
 import {
     bookingUrl,
@@ -12,11 +13,11 @@ import {
 } from '@/lib/collection';
 import { cn } from '@/lib/utils';
 
-type Props = { places: Place[]; homeCity: string };
+type Props = { places: Place[]; homeCity: string; aiEnabled: boolean };
 
 const GUESTS = [2, 3, 4, 5, 6, 8];
 
-export default function TonightPage({ places, homeCity }: Props) {
+export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
     const [guests, setGuests] = useState(4);
     const [mood, setMood] = useState<OccasionKey>('business_lunch');
     const [booking, setBooking] = useState<Place | null>(null);
@@ -38,7 +39,6 @@ export default function TonightPage({ places, homeCity }: Props) {
                 <h1 className="mt-1 font-serif text-[34px] leading-tight md:text-[36px]">
                     Dinner tonight
                 </h1>
-
                 <section className="mt-6">
                     <h2 className="mb-3 text-[15px] font-semibold">
                         How many people?
@@ -70,6 +70,15 @@ export default function TonightPage({ places, homeCity }: Props) {
                         ))}
                     </div>
                 </section>
+
+                <div className="mt-7">
+                    <TonightHelper
+                        places={places}
+                        city={homeCity}
+                        guests={guests}
+                        aiEnabled={aiEnabled}
+                    />
+                </div>
 
                 <section className="mt-7">
                     <h2 className="mb-3 text-[15px] font-semibold">
