@@ -77,6 +77,8 @@ export default function FriendsPage({
     me,
 }: Props) {
     const [copied, setCopied] = useState<number | null>(null);
+    // When the phone won't let us copy, show the link so he can copy it.
+    const [showLink, setShowLink] = useState<number | null>(null);
     const [tastesOpen, setTastesOpen] = useState(false);
     const [privacyOpen, setPrivacyOpen] = useState(false);
     const [newTag, setNewTag] = useState('');
@@ -87,7 +89,7 @@ export default function FriendsPage({
             setCopied(invite.id);
             setTimeout(() => setCopied(null), 2000);
         } catch {
-            window.prompt('Copy this link', invite.url);
+            setShowLink(invite.id);
         }
     };
     const saveTags = (tags: string[]) =>
@@ -193,6 +195,20 @@ export default function FriendsPage({
                                     Cancel link
                                 </button>
                             </div>
+                            {showLink === invite.id && (
+                                <label className="block">
+                                    <span className="mb-1 block text-[13px] text-ink-muted">
+                                        Press and hold the link to copy it
+                                    </span>
+                                    <input
+                                        readOnly
+                                        autoFocus
+                                        value={invite.url}
+                                        onFocus={(e) => e.target.select()}
+                                        className="h-12 w-full rounded-input border border-line-strong bg-ivory/40 px-4 text-[15px] text-ink focus:border-ink focus:outline-none"
+                                    />
+                                </label>
+                            )}
                         </div>
                     ))}
                     {invites.length === 0 && (

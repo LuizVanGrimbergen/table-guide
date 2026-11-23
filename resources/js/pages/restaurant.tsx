@@ -11,7 +11,8 @@ import {
     UtensilsCrossed,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import InputError from '@/components/input-error';
 import { BottomSheet } from '@/components/tc/bottom-sheet';
 import { ColourBlock } from '@/components/tc/restaurant-card';
@@ -64,7 +65,7 @@ type Props = {
     friends: Friend[];
 };
 
-type SheetKind = 'menu' | 'book' | 'recommend' | 'plan' | null;
+type SheetKind = 'menu' | 'book' | 'recommend' | 'plan' | 'remove' | null;
 
 const MENU_KINDS = {
     food: 'Food menu',
@@ -82,8 +83,28 @@ const VERIFY_LABELS: Record<string, string> = {
 const field =
     'h-12 w-full rounded-input border border-line-strong bg-paper px-4 text-base text-ink placeholder:text-stone focus:border-ink focus:outline-none';
 
-export default function RestaurantPage({ restaurant, entry, friends }: Props) {
+/** Server field -> the matching field on Place, for instant feedback. */
+const OPTIMISTIC_FIELDS: Record<string, keyof Place> = {
+    favourite: 'favourite',
+    status: 'status',
+    rating: 'rating',
+    not_recommended: 'notRecommended',
+    note: 'note',
+};
+
+export default function RestaurantPage({
+    restaurant,
+    entry: savedEntry,
+    friends,
+}: Props) {
     const [sheet, setSheet] = useState<SheetKind>(null);
+    // Changes show straight away; the server's answer then replaces them.
+    // If saving fails they are dropped, so the screen goes back to the truth.
+    const [pending, setPending] = useState<Partial<Place>>({});
+    const inFlight = useRef(0);
+    const entry: Place | null = savedEntry
+        ? { ...savedEntry, ...pending }
+        : null;
     const close = (open: boolean) => !open && setSheet(null);
     const status = entry ? statusOf(entry) : null;
     const tags = [
@@ -94,12 +115,39 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
     ].filter(Boolean) as string[];
 
     const patch = (data: Record<string, FormDataConvertible>) => {
-        if (entry) {
-            router.patch(`/entries/${entry.id}`, data, {
-                preserveScroll: true,
-                preserveState: true,
-            });
+        if (!entry) {
+            return;
         }
+
+        const optimistic: Partial<Place> = {};
+
+        for (const [key, value] of Object.entries(data)) {
+            const field = OPTIMISTIC_FIELDS[key];
+
+            if (field) {
+                Object.assign(optimistic, { [field]: value });
+            }
+        }
+
+        setPending((p) => ({ ...p, ...optimistic }));
+        inFlight.current += 1;
+
+        router.patch(`/entries/${entry.id}`, data, {
+            preserveScroll: true,
+            preserveState: true,
+            onError: () => {
+                toast("Couldn't save that. Please try again.");
+            },
+            onFinish: () => {
+                inFlight.current -= 1;
+
+                // Wait for the last tap's answer before showing the server's
+                // copy, so quick double taps don't flicker.
+                if (inFlight.current === 0) {
+                    setPending({});
+                }
+            },
+        });
     };
 
     return (
@@ -325,15 +373,7 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
                     {entry && (
                         <button
                             type="button"
-                            onClick={() => {
-                                if (
-                                    window.confirm(
-                                        `Remove ${restaurant.name} from your collection? Your note and rating will be deleted.`,
-                                    )
-                                ) {
-                                    router.delete(`/entries/${entry.id}`);
-                                }
-                            }}
+                            onClick={() => setSheet('remove')}
                             className="mt-6 h-11 w-full text-[15px] text-not-recommended underline underline-offset-4"
                         >
                             Remove from my collection
@@ -364,6 +404,37 @@ export default function RestaurantPage({ restaurant, entry, friends }: Props) {
                 onOpenChange={close}
                 restaurant={restaurant}
             />
+            {entry && (
+                <BottomSheet
+                    open={sheet === 'remove'}
+                    onOpenChange={close}
+                    title="Remove this place?"
+                    description={restaurant.name}
+                >
+                    <p className="text-[15px] text-ink-muted">
+                        It leaves your collection, together with your note and
+                        rating. This can't be undone.
+                    </p>
+                    <div className="mt-5 flex flex-col gap-2">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                router.delete(`/entries/${entry.id}`)
+                            }
+                            className="h-[52px] rounded-full bg-warm text-[15px] font-semibold text-paper transition duration-120 active:scale-96 active:opacity-80"
+                        >
+                            Remove from my collection
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setSheet(null)}
+                            className="h-12 text-[15px] font-medium text-ink-muted"
+                        >
+                            Keep it
+                        </button>
+                    </div>
+                </BottomSheet>
+            )}
         </>
     );
 }
