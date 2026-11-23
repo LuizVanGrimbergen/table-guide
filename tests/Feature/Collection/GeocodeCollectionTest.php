@@ -54,7 +54,7 @@ test('a confident match stores place id and location without touching saved entr
 });
 
 test('uncertain matches are flagged needs_review', function (array $response, ?VerifyStatus $expected) {
-    $restaurant = Restaurant::factory()->create(['name' => 'Fratelli Paradiso']);
+    $restaurant = Restaurant::factory()->create(['name' => 'Fratelli Paradiso', 'area' => 'Potts Point']);
     Http::fake(['places.googleapis.com/*' => Http::response($response)]);
 
     $this->artisan('collection:geocode')->assertSuccessful();
@@ -64,8 +64,20 @@ test('uncertain matches are flagged needs_review', function (array $response, ?V
     'different name' => [place('x1', 'Totally Other Diner'), VerifyStatus::NeedsReview],
     'far from the city' => [place('x2', 'Fratelli Paradiso', -37.81, 144.96), VerifyStatus::NeedsReview],
     'no result' => [[], VerifyStatus::NeedsReview],
+    'address in another suburb' => [place('x4', 'Fratelli Paradiso'), VerifyStatus::NeedsReview],
     'permanently closed' => [place('x3', 'Fratelli Paradiso', status: 'CLOSED_PERMANENTLY'), VerifyStatus::PossiblyClosed],
 ]);
+
+test('a match in the suburb he wrote, or in the CBD, is not flagged', function (string $area) {
+    $restaurant = Restaurant::factory()->create(['name' => 'Fratelli Paradiso', 'area' => $area]);
+    $response = place('ok', 'Fratelli Paradiso');
+    $response['places'][0]['formattedAddress'] = '12 Challis Ave, Potts Point NSW 2011, Australia';
+    Http::fake(['places.googleapis.com/*' => Http::response($response)]);
+
+    $this->artisan('collection:geocode')->assertSuccessful();
+
+    expect($restaurant->fresh()->verify_status)->toBeNull();
+})->with(['Potts Point', 'CBD']);
 
 test('two entries resolving to the same place are flagged, not merged', function () {
     Restaurant::factory()->create(['name' => 'Glenmore', 'google_place_id' => 'same', 'geocoded_at' => now()]);

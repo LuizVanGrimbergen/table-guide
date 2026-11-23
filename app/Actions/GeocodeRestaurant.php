@@ -114,6 +114,13 @@ class GeocodeRestaurant
             $doubts[] = "Name differs: \"{$found}\" ({$similarity}%)";
         }
 
+        // He wrote a suburb, and Google's address is somewhere else.
+        $address = (string) ($place['formattedAddress'] ?? '');
+        if ($restaurant->area && $address !== '' && ! self::isCityCentre($restaurant->area)
+            && stripos($address, $restaurant->area) === false) {
+            $doubts[] = "Address is not in {$restaurant->area}: {$address}";
+        }
+
         $lat = $place['location']['latitude'] ?? null;
         $lng = $place['location']['longitude'] ?? null;
 
@@ -143,6 +150,12 @@ class GeocodeRestaurant
         }
 
         return null;
+    }
+
+    /** "CBD" or "City" can't be checked against an address. */
+    private static function isCityCentre(string $area): bool
+    {
+        return in_array(mb_strtolower($area), ['cbd', 'city', 'city centre', 'downtown', 'centre'], true);
     }
 
     public static function nameSimilarity(string $a, string $b): int
