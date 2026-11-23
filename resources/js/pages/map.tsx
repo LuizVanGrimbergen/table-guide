@@ -84,7 +84,7 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
             <Head title="Map" />
             <div className="relative h-[calc(100dvh-64px-env(safe-area-inset-bottom))] overflow-hidden bg-sand md:h-dvh">
                 {canShowMap ? (
-                    <APIProvider apiKey={MAPS_KEY!}>
+                    <APIProvider apiKey={MAPS_KEY!} language="en">
                         <GoogleMap
                             key={city}
                             mapId={mapId || 'DEMO_MAP_ID'}
