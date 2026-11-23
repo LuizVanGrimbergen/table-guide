@@ -3,6 +3,7 @@
 A private, mobile-first restaurant guide (installable PWA) for my godfather in Sydney. He keeps his own collection of restaurants, sends recommendations to friends and clients, and quickly decides where to eat tonight. Simplicity is the highest priority: every screen should be usable by someone who is not technical.
 
 Read these before starting:
+
 - `docs/original-brief.md`: the full original product brief.
 - `docs/spec.md`: screens, flows and UX decisions that were already made in the design phase.
 - `docs/design-system.md`: colours, type, spacing and components.
@@ -41,6 +42,7 @@ Never commit keys. Never hardcode keys in components.
 - `dinner_plans` and `plan_guests` (Phase 2)
 
 Rules:
+
 - Two users can rate the same restaurant independently: ratings and notes live on `saved_entries`, never on `restaurants`.
 - Verification jobs may update `restaurants` but must never touch `saved_entries`.
 - Policies: only the owner can edit their entries. Friends see only what visibility allows.
