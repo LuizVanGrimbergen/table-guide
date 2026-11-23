@@ -1,25 +1,22 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
+import CollectionLayout from '@/layouts/collection-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'The Collection';
 
 void createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? `${title} · ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
-                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return [CollectionLayout, SettingsLayout];
             default:
-                return AppLayout;
+                return CollectionLayout;
         }
     },
     strictMode: true,
@@ -32,9 +29,14 @@ void createInertiaApp({
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#4F5A2E',
     },
 });
 
-// This will set light / dark mode on load...
-initializeTheme();
+// Installable app + offline copy of his collection. Not in dev, where Vite
+// serves files on the fly.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    window.addEventListener('load', () => {
+        void navigator.serviceWorker.register('/sw.js');
+    });
+}
