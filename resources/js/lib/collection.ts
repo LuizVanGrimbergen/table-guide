@@ -672,3 +672,26 @@ export function filtersToQuery(filters: Filters, homeCity: string): string {
 
     return query ? `?${query}` : '';
 }
+
+export type LatLng = { lat: number; lng: number };
+
+/** Straight-line distance in km (haversine). Good enough for "how far". */
+export function distanceKm(a: LatLng, b: LatLng): number {
+    const rad = (d: number) => (d * Math.PI) / 180;
+    const dLat = rad(b.lat - a.lat);
+    const dLng = rad(b.lng - a.lng);
+    const h =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+
+    return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
+/** "450 m" under 1 km, "2.4 km" under 10 km, "14 km" above. */
+export function formatDistance(km: number): string {
+    if (km < 1) {
+        return `${Math.max(50, Math.round((km * 1000) / 50) * 50)} m`;
+    }
+
+    return km < 10 ? `${km.toFixed(1)} km` : `${Math.round(km)} km`;
+}
