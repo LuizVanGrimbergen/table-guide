@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -18,9 +18,26 @@ type Props = {
 };
 
 export default function Login({ status, canResetPassword }: Props) {
+    const { devLogin } = usePage<{ devLogin?: boolean }>().props;
+
     return (
         <>
             <Head title="Log in" />
+
+            {devLogin && (
+                <div className="mb-6 flex flex-col gap-2">
+                    <Button
+                        asChild
+                        variant="outline"
+                        className="h-12 w-full rounded-full"
+                    >
+                        <Link href="/dev-login">Continue as test user</Link>
+                    </Button>
+                    <p className="text-center text-xs text-muted-foreground">
+                        Local development only
+                    </p>
+                </div>
+            )}
 
             <PasskeyVerify />
 
