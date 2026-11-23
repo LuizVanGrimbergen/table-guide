@@ -11,7 +11,7 @@ type Props = {
     label?: string;
 };
 
-/** 44px filter pill. Black when active. */
+/** 44px filter pill. Cognac when active. */
 export function Pill({
     children,
     active,
@@ -29,7 +29,7 @@ export function Pill({
             className={cn(
                 'inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full border px-4 text-[15px] font-semibold whitespace-nowrap transition duration-120 active:scale-96 active:opacity-80',
                 active
-                    ? 'border-ink bg-ink text-paper'
+                    ? 'border-brand bg-brand text-paper'
                     : 'border-line-strong bg-paper text-ink',
                 chevron && 'pr-3',
                 className,

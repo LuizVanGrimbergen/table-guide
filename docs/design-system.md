@@ -9,7 +9,7 @@ Warm and professional, like a good hotel restaurant. Updated after the first bui
 |---|---|---|
 | ivory | #F7F2EA | app background (warm cream) |
 | paper | #FFFDF9 | cards, sheets, inputs |
-| ink | #2A2420 | text, primary buttons, active pills (warm charcoal) |
+| ink | #2A2420 | text, primary buttons (warm charcoal) |
 | ink-muted | #6B6158 | secondary text |
 | line | #E6DDD0 | borders |
 | line-strong | #D8CCBB | pill borders |
@@ -37,7 +37,7 @@ Card colour blocks (until photos): clay #B5734F, ochre #C29A5B, sage #8A9A7B, sl
 
 ## Components
 - Primary button: ink background, paper text, pill. Secondary: transparent, 1px ink border.
-- Filter pill: 44px, paper with line-strong border; active = ink with paper text; chevron.
+- Filter pill: 44px, paper with line-strong border; active = brand (cognac) with paper text; chevron. Black is not used for active states.
 - Bottom sheet: paper, radius 24 top, grab handle, title in Newsreader 26, close button.
 - Choice row (in sheets): 58px min, label 17px, hint 13px muted, count, round check (olive when on).
 - Restaurant card: paper, 1px line border, 96px colour or photo block, status badge (dot + label), name Newsreader 23, note Newsreader italic 18, area 14 muted.
