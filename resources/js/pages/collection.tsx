@@ -56,7 +56,15 @@ export default function CollectionPage({ places, homeCity, initial }: Props) {
     );
     const [sheet, setSheet] = useState<SheetKind>(null);
     const [limit, setLimit] = useState(PAGE);
-    const [view, setView] = useState<'cards' | 'list'>(readView);
+    // Start as cards on the server and client alike, then apply the saved
+    // choice after the page has loaded (avoids a server/client mismatch).
+    const [view, setView] = useState<'cards' | 'list'>('cards');
+    const [viewLoaded, setViewLoaded] = useState(false);
+
+    useEffect(() => {
+        setView(readView());
+        setViewLoaded(true);
+    }, []);
     const searchRef = useRef<HTMLInputElement>(null);
 
     const update = (patch: Partial<Filters>) => {
@@ -79,12 +87,16 @@ export default function CollectionPage({ places, homeCity, initial }: Props) {
     }, [initial.focus]);
 
     useEffect(() => {
+        if (!viewLoaded) {
+            return;
+        }
+
         try {
             localStorage.setItem('tc.view', view);
         } catch {
             // Private mode: fine, the view just is not remembered.
         }
-    }, [view]);
+    }, [view, viewLoaded]);
 
     const results = useMemo(
         () => filterPlaces(places, filters),
@@ -209,7 +221,7 @@ export default function CollectionPage({ places, homeCity, initial }: Props) {
                         <button
                             type="button"
                             onClick={() => update(defaultFilters(homeCity))}
-                            className="h-11 px-2 text-[15px] font-medium text-olive underline underline-offset-4"
+                            className="h-11 px-2 text-[15px] font-medium text-brand underline underline-offset-4"
                         >
                             Reset
                         </button>
@@ -367,7 +379,7 @@ export default function CollectionPage({ places, homeCity, initial }: Props) {
                         className={cn(
                             'relative h-[26px] w-11 shrink-0 rounded-full transition',
                             filters.hideNotRecommended
-                                ? 'bg-olive'
+                                ? 'bg-brand'
                                 : 'bg-line-strong',
                         )}
                     >
