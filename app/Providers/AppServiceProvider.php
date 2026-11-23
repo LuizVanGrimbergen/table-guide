@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Services\GooglePlaces;
+use App\Services\Tonight\ClaudeDinnerAi;
+use App\Services\Tonight\DinnerAi;
+use App\Services\Tonight\TonightAdvisor;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(DinnerAi::class, fn () => new ClaudeDinnerAi(
+            config('services.anthropic.key'),
+            config('services.anthropic.model'),
+        ));
+        $this->app->bind(TonightAdvisor::class, fn ($app) => new TonightAdvisor($app->make(DinnerAi::class)));
         $this->app->singleton(GooglePlaces::class, fn () => new GooglePlaces(config('services.google.places_server_key')));
     }
 

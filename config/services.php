@@ -35,6 +35,12 @@ return [
         ],
     ],
 
+    'anthropic' => [
+        // Server-side only. Without a key, Tonight suggestions use the rule-based matcher.
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-opus-5-5'),
+    ],
+
     'google' => [
         'maps_browser_key' => env('GOOGLE_MAPS_BROWSER_KEY'),
         'map_id' => env('GOOGLE_MAP_ID'),

@@ -9,6 +9,7 @@ use App\Http\Controllers\PlaceSearchController;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\SavedEntryController;
+use App\Http\Controllers\TonightController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -18,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('collection', [CollectionController::class, 'index'])->name('collection');
     Route::get('map', [CollectionController::class, 'map'])->name('map');
     Route::get('tonight', [CollectionController::class, 'tonight'])->name('tonight');
+    Route::post('tonight/suggest', [TonightController::class, 'suggest'])->middleware('throttle:20,1')->name('tonight.suggest');
     Route::get('friends', [FriendsController::class, 'index'])->name('friends');
     Route::post('friends/invite', [FriendsController::class, 'invite'])->name('friends.invite');
     Route::delete('friendships/{friendship}', [FriendsController::class, 'destroy'])->name('friendships.destroy');
