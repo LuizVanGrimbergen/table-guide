@@ -7,7 +7,7 @@ Bottom nav: Home, My Places, + (raised, centre), Map, Friends. Top right: a labe
 
 ## Home (top to bottom)
 Home is kept deliberately quiet so it never overwhelms.
-1. Search field. Typing jumps to the Collection with results. (Add lives in the navigation, not here.)
+1. Search field. Results show right on Home as you type (all cities), so the phone keyboard stays open; "See all N in My Places" past 20. (Add lives in the navigation, not here.)
 2. "Where to tonight?" large button, opens Tonight.
 3. Favourites: horizontal row of small tiles (colour block with a cuisine line icon, name, cuisine · area), with "See all".
 4. "Browse by occasion": a plain list of rows with counts (Business lunch, Special occasions, Casual, Bars, Suburban). Tapping opens the Collection pre filtered (Sydney, recommended only).
