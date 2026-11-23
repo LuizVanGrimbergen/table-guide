@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 
 const NAV = [
     { label: 'Home', href: '/', icon: Home },
-    { label: 'Collection', href: '/collection', icon: LibraryBig },
+    { label: 'My Places', href: '/collection', icon: LibraryBig },
     { label: 'Map', href: '/map', icon: MapIcon },
     { label: 'Friends', href: '/friends', icon: Users },
 ];
