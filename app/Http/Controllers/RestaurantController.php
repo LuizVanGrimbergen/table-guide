@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\EntryStatus;
 use App\Http\Requests\StoreRestaurantRequest;
+use App\Http\Requests\UpdateRestaurantBookingRequest;
 use App\Models\Restaurant;
 use App\Models\SavedEntry;
 use App\Models\User;
@@ -77,5 +78,19 @@ class RestaurantController extends Controller
 
         return redirect()->route('restaurants.show', $restaurant)
             ->with('toast', "{$restaurant->name} is in your collection");
+    }
+
+    /** Booking platform, venue id and link. Only shared facts, never personal. */
+    public function updateBooking(UpdateRestaurantBookingRequest $request, Restaurant $restaurant): RedirectResponse
+    {
+        $data = $request->validated();
+
+        $restaurant->update([
+            'booking_provider' => $data['booking_provider'],
+            'booking_venue_id' => filled($data['booking_venue_id'] ?? null) ? trim($data['booking_venue_id']) : null,
+            'booking_url' => $data['booking_url'] ?? null,
+        ]);
+
+        return back()->with('toast', 'Booking details saved');
     }
 }

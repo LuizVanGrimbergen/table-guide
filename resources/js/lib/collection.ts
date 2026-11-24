@@ -34,9 +34,11 @@ export type Place = {
     status: EntryStatus;
     favourite: boolean;
     notRecommended: boolean;
+    inChecker: boolean;
     rating: number | null;
     note: string | null;
     website: string | null;
+    bookingUrl: string | null;
     lat: number | null;
     lng: number | null;
     verifyStatus: string | null;
@@ -516,11 +518,20 @@ export function directionsUrl(place: Locatable): string {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(locationQuery(place))}`;
 }
 
-/** The restaurant's own site if we have it; otherwise a search for it. */
-export function bookingUrl(place: Locatable & { website: string | null }): {
+/**
+ * The booking page if we have it, then the restaurant's own site;
+ * otherwise a search for it.
+ */
+export function bookingUrl(
+    place: Locatable & { website: string | null; bookingUrl?: string | null },
+): {
     url: string;
     isOwnSite: boolean;
 } {
+    if (place.bookingUrl) {
+        return { url: place.bookingUrl, isOwnSite: true };
+    }
+
     if (place.website) {
         return { url: place.website, isOwnSite: true };
     }

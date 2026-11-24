@@ -24,6 +24,7 @@ class UpdateSavedEntryRequest extends FormRequest
             'status' => ['sometimes', Rule::enum(EntryStatus::class)],
             'favourite' => ['sometimes', 'boolean'],
             'not_recommended' => ['sometimes', 'boolean'],
+            'in_checker' => ['sometimes', 'boolean'],
             'rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
             'note' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'visibility' => ['sometimes', Rule::enum(Visibility::class)],

@@ -31,6 +31,12 @@ class SavedEntryFactory extends Factory
         return $this->state(fn () => ['status' => EntryStatus::Wish]);
     }
 
+    /** Shown in the user's table checker. */
+    public function inChecker(): static
+    {
+        return $this->state(fn () => ['in_checker' => true]);
+    }
+
     public function visibility(Visibility $visibility): static
     {
         return $this->state(fn () => ['visibility' => $visibility]);

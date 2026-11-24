@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import InputError from '@/components/input-error';
 import { BottomSheet } from '@/components/tc/bottom-sheet';
+import { ChoiceRow } from '@/components/tc/choice-row';
 import { ColourBlock } from '@/components/tc/restaurant-card';
 import { Stars } from '@/components/tc/stars';
 import { downloadIcs, googleCalendarUrl } from '@/lib/calendar';
@@ -51,6 +52,10 @@ type Restaurant = {
     occasion: OccasionKey | null;
     website: string | null;
     phone: string | null;
+    bookingProvider: BookingProviderKey;
+    bookingVenueId: string | null;
+    bookingUrl: string | null;
+    canEdit: boolean;
     lat: number | null;
     lng: number | null;
     verifyStatus: string | null;
@@ -65,7 +70,34 @@ type Props = {
     friends: Friend[];
 };
 
-type SheetKind = 'menu' | 'book' | 'recommend' | 'plan' | 'remove' | null;
+type SheetKind =
+    | 'menu'
+    | 'book'
+    | 'booking-details'
+    | 'recommend'
+    | 'plan'
+    | 'remove'
+    | null;
+
+type BookingProviderKey =
+    | 'sevenrooms'
+    | 'opentable'
+    | 'nowbookit'
+    | 'resdiary'
+    | 'phone'
+    | 'none';
+
+const BOOKING_PROVIDERS: Record<
+    BookingProviderKey,
+    { label: string; hint: string; online: boolean }
+> = {
+    sevenrooms: { label: 'SevenRooms', hint: 'Online', online: true },
+    opentable: { label: 'OpenTable', hint: 'Online', online: true },
+    nowbookit: { label: 'Now Book It', hint: 'Online', online: true },
+    resdiary: { label: 'ResDiary', hint: 'Online', online: true },
+    phone: { label: 'By phone', hint: 'No online bookings', online: false },
+    none: { label: 'Not set', hint: 'Or no bookings taken', online: false },
+};
 
 const MENU_KINDS = {
     food: 'Food menu',
@@ -89,6 +121,7 @@ const OPTIMISTIC_FIELDS: Record<string, keyof Place> = {
     status: 'status',
     rating: 'rating',
     not_recommended: 'notRecommended',
+    in_checker: 'inChecker',
     note: 'note',
 };
 
@@ -351,6 +384,33 @@ export default function RestaurantPage({
                                 See today's hours on Google Maps
                             </a>
                         </Detail>
+                        <Detail label="Booking">
+                            <span className="flex items-baseline justify-between gap-3">
+                                <span
+                                    className={cn(
+                                        restaurant.bookingProvider === 'none' &&
+                                            'text-ink-muted',
+                                    )}
+                                >
+                                    {
+                                        BOOKING_PROVIDERS[
+                                            restaurant.bookingProvider
+                                        ].label
+                                    }
+                                </span>
+                                {restaurant.canEdit && (
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setSheet('booking-details')
+                                        }
+                                        className="-my-2 min-h-11 px-1 font-medium text-brand underline underline-offset-4"
+                                    >
+                                        Edit
+                                    </button>
+                                )}
+                            </span>
+                        </Detail>
                         <Detail label="Checked">
                             {restaurant.verifyStatus ? (
                                 <span
@@ -392,6 +452,13 @@ export default function RestaurantPage({
                 onOpenChange={close}
                 restaurant={restaurant}
             />
+            {restaurant.canEdit && (
+                <BookingDetailsSheet
+                    open={sheet === 'booking-details'}
+                    onOpenChange={close}
+                    restaurant={restaurant}
+                />
+            )}
             <RecommendSheet
                 open={sheet === 'recommend'}
                 onOpenChange={close}
@@ -562,33 +629,192 @@ function PersonalCard({
                 Only you can see this. Saved when you tap away.
             </p>
 
-            <button
-                type="button"
-                role="switch"
-                aria-checked={entry.notRecommended}
-                onClick={() =>
+            <ToggleRow
+                label="I don't recommend this place"
+                on={entry.notRecommended}
+                onToggle={() =>
                     onPatch({ not_recommended: !entry.notRecommended })
                 }
-                className="mt-4 flex min-h-11 w-full items-center justify-between gap-3 text-left text-[15px]"
+                onClassName="bg-not-recommended"
+            />
+            <ToggleRow
+                label="Show in my table checker"
+                hint="Looks up free tables here when you plan a dinner"
+                on={entry.inChecker}
+                onToggle={() => onPatch({ in_checker: !entry.inChecker })}
+                onClassName="bg-been"
+            />
+        </section>
+    );
+}
+
+function ToggleRow({
+    label,
+    hint,
+    on,
+    onToggle,
+    onClassName,
+}: {
+    label: string;
+    hint?: string;
+    on: boolean;
+    onToggle: () => void;
+    onClassName: string;
+}) {
+    return (
+        <button
+            type="button"
+            role="switch"
+            aria-checked={on}
+            onClick={onToggle}
+            className="mt-4 flex min-h-11 w-full items-center justify-between gap-3 text-left text-[15px]"
+        >
+            <span>
+                {label}
+                {hint && (
+                    <span className="block text-[13px] text-ink-muted">
+                        {hint}
+                    </span>
+                )}
+            </span>
+            <span
+                className={cn(
+                    'relative h-[26px] w-11 shrink-0 rounded-full transition',
+                    on ? onClassName : 'bg-line-strong',
+                )}
             >
-                I don't recommend this place
                 <span
                     className={cn(
-                        'relative h-[26px] w-11 shrink-0 rounded-full transition',
-                        entry.notRecommended
-                            ? 'bg-not-recommended'
-                            : 'bg-line-strong',
+                        'absolute top-[3px] size-5 rounded-full bg-paper transition-all',
+                        on ? 'left-[21px]' : 'left-[3px]',
                     )}
+                />
+            </span>
+        </button>
+    );
+}
+
+/**
+ * Which platform the place books through, its venue id on that platform
+ * and the public booking link. The venue id is what the table checker uses.
+ */
+function BookingDetailsSheet({
+    open,
+    onOpenChange,
+    restaurant,
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    restaurant: Restaurant;
+}) {
+    const form = useForm({
+        booking_provider: restaurant.bookingProvider,
+        booking_venue_id: restaurant.bookingVenueId ?? '',
+        booking_url: restaurant.bookingUrl ?? '',
+    });
+    const online = BOOKING_PROVIDERS[form.data.booking_provider].online;
+
+    return (
+        <BottomSheet
+            open={open}
+            onOpenChange={onOpenChange}
+            title="Booking details"
+            description={restaurant.name}
+        >
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.patch(`/restaurants/${restaurant.id}/booking`, {
+                        preserveScroll: true,
+                        onSuccess: () => onOpenChange(false),
+                    });
+                }}
+            >
+                <p className="mb-2 text-sm font-medium">How do they book?</p>
+                <div role="radiogroup" aria-label="Booking platform">
+                    {(
+                        Object.keys(BOOKING_PROVIDERS) as BookingProviderKey[]
+                    ).map((key) => (
+                        <ChoiceRow
+                            key={key}
+                            label={BOOKING_PROVIDERS[key].label}
+                            hint={BOOKING_PROVIDERS[key].hint}
+                            on={form.data.booking_provider === key}
+                            onChoose={() =>
+                                form.setData('booking_provider', key)
+                            }
+                        />
+                    ))}
+                </div>
+                <InputError
+                    className="mt-1"
+                    message={form.errors.booking_provider}
+                />
+
+                {online && (
+                    <>
+                        <label
+                            htmlFor="booking_venue_id"
+                            className="mt-5 mb-1.5 block text-sm font-medium"
+                        >
+                            Venue ID on{' '}
+                            {
+                                BOOKING_PROVIDERS[form.data.booking_provider]
+                                    .label
+                            }
+                        </label>
+                        <input
+                            id="booking_venue_id"
+                            value={form.data.booking_venue_id}
+                            onChange={(e) =>
+                                form.setData('booking_venue_id', e.target.value)
+                            }
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            spellCheck={false}
+                            className={field}
+                        />
+                        <p className="mt-1 text-[13px] text-ink-muted">
+                            Usually the last part of their booking link.
+                        </p>
+                        <InputError
+                            className="mt-1"
+                            message={form.errors.booking_venue_id}
+                        />
+                    </>
+                )}
+
+                <label
+                    htmlFor="booking_url"
+                    className="mt-5 mb-1.5 block text-sm font-medium"
                 >
-                    <span
-                        className={cn(
-                            'absolute top-[3px] size-5 rounded-full bg-paper transition-all',
-                            entry.notRecommended ? 'left-[21px]' : 'left-[3px]',
-                        )}
-                    />
-                </span>
-            </button>
-        </section>
+                    Booking page link
+                </label>
+                <input
+                    id="booking_url"
+                    type="url"
+                    inputMode="url"
+                    value={form.data.booking_url}
+                    onChange={(e) =>
+                        form.setData('booking_url', e.target.value)
+                    }
+                    placeholder="https://"
+                    className={field}
+                />
+                <InputError
+                    className="mt-1"
+                    message={form.errors.booking_url}
+                />
+
+                <button
+                    type="submit"
+                    disabled={form.processing}
+                    className="mt-6 h-[52px] w-full rounded-full bg-ink text-[15px] font-semibold text-paper transition duration-120 active:scale-96 active:opacity-80 disabled:opacity-60"
+                >
+                    Save
+                </button>
+            </form>
+        </BottomSheet>
     );
 }
 
@@ -761,8 +987,7 @@ function BookSheet({
                 </a>
             )}
             <p className="mt-5 rounded-card bg-warm-tint p-4 text-[14px] text-quote">
-                Nothing is booked until the restaurant confirms. We can't see
-                live tables yet.
+                Nothing is booked until the restaurant confirms.
             </p>
         </BottomSheet>
     );

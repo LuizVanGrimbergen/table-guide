@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BookingProvider;
 use App\Enums\Occasion;
 use App\Enums\VerifyStatus;
 use Carbon\CarbonImmutable;
@@ -26,6 +27,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $google_place_id
  * @property string|null $website
  * @property string|null $phone
+ * @property BookingProvider $booking_provider
+ * @property string|null $booking_venue_id
+ * @property string|null $booking_url
  * @property int|null $price_level
  * @property string|null $cuisine
  * @property Occasion|null $occasion
@@ -35,13 +39,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 #[Fillable([
     'name', 'city', 'area', 'country', 'address', 'lat', 'lng', 'google_place_id',
-    'website', 'phone', 'price_level', 'cuisine', 'occasion', 'verify_status',
+    'website', 'phone', 'booking_provider', 'booking_venue_id', 'booking_url', 'price_level', 'cuisine', 'occasion', 'verify_status',
     'verified_at', 'geocoded_at',
 ])]
 class Restaurant extends Model
 {
     /** @use HasFactory<RestaurantFactory> */
     use HasFactory;
+
+    protected $attributes = [
+        'booking_provider' => 'none',
+    ];
 
     protected function casts(): array
     {
@@ -50,6 +58,7 @@ class Restaurant extends Model
             'lng' => 'float',
             'price_level' => 'integer',
             'occasion' => Occasion::class,
+            'booking_provider' => BookingProvider::class,
             'verify_status' => VerifyStatus::class,
             'verified_at' => 'datetime',
             'geocoded_at' => 'datetime',

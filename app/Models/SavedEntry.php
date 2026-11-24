@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property EntryStatus $status
  * @property bool $favourite
  * @property bool $not_recommended
+ * @property bool $in_checker
  * @property int|null $rating
  * @property string|null $note
  * @property string|null $recommended_by
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property list<string>|null $good_for
  */
 #[Fillable([
-    'user_id', 'restaurant_id', 'status', 'favourite', 'not_recommended', 'rating',
+    'user_id', 'restaurant_id', 'status', 'favourite', 'not_recommended', 'in_checker', 'rating',
     'note', 'recommended_by', 'visited_on', 'visibility', 'good_for',
 ])]
 class SavedEntry extends Model
@@ -42,6 +43,7 @@ class SavedEntry extends Model
         'visibility' => 'private',
         'favourite' => false,
         'not_recommended' => false,
+        'in_checker' => false,
     ];
 
     protected function casts(): array
@@ -51,6 +53,7 @@ class SavedEntry extends Model
             'visibility' => Visibility::class,
             'favourite' => 'boolean',
             'not_recommended' => 'boolean',
+            'in_checker' => 'boolean',
             'rating' => 'integer',
             'visited_on' => 'date',
             'good_for' => 'array',

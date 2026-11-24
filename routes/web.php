@@ -31,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('places/search', PlaceSearchController::class)->middleware('throttle:30,1')->name('places.search');
     Route::post('restaurants', [RestaurantController::class, 'store'])->name('restaurants.store');
     Route::get('restaurants/{restaurant}', [RestaurantController::class, 'show'])->name('restaurants.show');
+    Route::patch('restaurants/{restaurant}/booking', [RestaurantController::class, 'updateBooking'])->name('restaurants.booking.update');
     Route::post('restaurants/{restaurant}/save', [SavedEntryController::class, 'store'])->name('entries.store');
     Route::post('restaurants/{restaurant}/menu-links', [MenuLinkController::class, 'store'])->name('menu-links.store');
     Route::delete('menu-links/{menuLink}', [MenuLinkController::class, 'destroy'])->name('menu-links.destroy');
