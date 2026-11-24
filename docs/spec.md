@@ -34,7 +34,22 @@ Hero image, heart (favourite), kicker (status · occasion), name, area, tags. Fo
 - "What kind of evening?": five large rows with hint and count: Business or clients, Something special, Easy and relaxed, Close to home, Just drinks. Starts on Easy and relaxed, then remembers the last choice on that device.
 - "Your top picks": top 5 from their own Sydney places that are Been there and not "not recommended". Ranking: favourite +2, good for groups +3 when 6 or more guests, has a note +1. Each pick: rank number, name, area, note, buttons Book a table and Directions (Google Maps directions URL).
 - "See all N in the Collection".
-- Footnote: Book opens the restaurant's own page. Live times come later.
+- "Check free tables" opens Free tables with the same number of people.
+- Footnote: Book opens the restaurant's own page. Nothing is booked until the restaurant confirms.
+
+## Free tables (route /tables)
+Opened from Tonight ("Check free tables", carries the number of people) and from More.
+- Kicker with the long date, title "Free tables". Date (native picker, from today), time (every 15 minutes, 11:00 to 22:45; starts at 19:00, later in the evening half an hour from now, after 22:00 tomorrow at 19:00), people 1 to 8 (two rows of four on phones).
+- One card per place he ticked with "Show in my table checker" on its page. Each card asks for its own answer, so a slow booking system only delays its own card.
+- Card: cuisine icon block, name, area · platform, then one coloured line and the times as buttons (in time order, the requested time in green):
+  - bottle green: "19:00 is free", with up to 3 other times within 90 minutes;
+  - ochre: "19:00 is taken. Other times:" with up to 3 times within 90 minutes;
+  - wine: "Nothing free around 19:00", link to see other days on their page;
+  - stone: why we don't know (books by phone, not set up, didn't answer, checked a moment ago...), with Call and/or Open booking page. Unknown is never shown as full.
+- Tapping a time or the card opens the restaurant's own booking page in a new tab with the date, time and party filled in where the platform allows it (SevenRooms: ?date=&party_size=&start_time=). Nothing is booked in the app.
+- Offline: a note that free times need the internet; nothing old is shown.
+- Footnote: times come from each restaurant's booking system and can change; nothing is booked until he confirms there and the restaurant confirms.
+- Booking details (platform, venue ID, booking link) are edited on the restaurant page under Details > Booking > Edit.
 
 ## Map
 Full screen Google Map, kept calm: one slim top bar, one chip row, swipe cards at the bottom.
