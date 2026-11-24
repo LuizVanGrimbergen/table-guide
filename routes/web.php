@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AvailabilityController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\DevLoginController;
 use App\Http\Controllers\FriendsController;
@@ -20,6 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('map', [CollectionController::class, 'map'])->name('map');
     Route::get('tonight', [CollectionController::class, 'tonight'])->name('tonight');
     Route::post('tonight/suggest', [TonightController::class, 'suggest'])->middleware('throttle:20,1')->name('tonight.suggest');
+    Route::get('tables', [AvailabilityController::class, 'page'])->name('tables');
+    Route::get('availability', [AvailabilityController::class, 'index'])->middleware('throttle:30,1')->name('availability.index');
+    Route::get('availability/{restaurant}', [AvailabilityController::class, 'show'])->middleware('throttle:120,1')->name('availability.show');
     Route::get('friends', [FriendsController::class, 'index'])->name('friends');
     Route::post('friends/invite', [FriendsController::class, 'invite'])->name('friends.invite');
     Route::delete('friendships/{friendship}', [FriendsController::class, 'destroy'])->name('friendships.destroy');
