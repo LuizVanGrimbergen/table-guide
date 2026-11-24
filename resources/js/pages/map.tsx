@@ -7,7 +7,7 @@ import {
     useMap,
 } from '@vis.gl/react-google-maps';
 import { LocateFixed, MapPinOff } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
     activeLabels,
     FilterBar,
@@ -24,6 +24,7 @@ import {
     statusOf,
 } from '@/lib/collection';
 import type { Cluster } from '@/lib/cluster';
+import { flyTo, flyToBounds } from '@/lib/camera';
 import { boundsOf, clusterPlaces } from '@/lib/cluster';
 import { cn } from '@/lib/utils';
 
@@ -172,11 +173,17 @@ export default function MapPage({ places, homeCity, mapId, cities }: Props) {
                             mapId={mapId || 'DEMO_MAP_ID'}
                             defaultCenter={centre}
                             defaultZoom={12}
+                            // Vector maps zoom continuously instead of in steps.
+                            renderingType={
+                                'VECTOR' as google.maps.RenderingType
+                            }
                             gestureHandling="greedy"
                             disableDefaultUI
                             clickableIcons={false}
                             onClick={() => setSelectedId(null)}
-                            onZoomChanged={(ev) => setZoom(ev.detail.zoom)}
+                            // Regroup pins once the map comes to rest, not on
+                            // every frame of a pinch: that kept redrawing them.
+                            onIdle={(ev) => setZoom(ev.map.getZoom() ?? 12)}
                             className="size-full"
                         >
                             {singles.map((p) => {
@@ -334,11 +341,16 @@ function FitToPins({
     radiusKm: number | null;
 }) {
     const map = useMap();
+    // The first fit happens as the map opens: no glide then.
+    const firstFit = useRef(true);
 
     useEffect(() => {
         if (!map) {
             return;
         }
+
+        const duration = firstFit.current ? 0 : undefined;
+        firstFit.current = false;
 
         // With a distance filter on, show the whole circle around you.
         const points: LatLng[] =
@@ -370,22 +382,17 @@ function FitToPins({
         }
 
         if (points.length === 1) {
-            map.panTo(points[0]);
-            map.setZoom(15);
+            flyTo(map, { center: points[0], zoom: 15 }, duration);
 
             return;
         }
 
-        const lats = points.map((p) => p.lat);
-        const lngs = points.map((p) => p.lng);
-        map.fitBounds(
-            {
-                north: Math.max(...lats),
-                south: Math.min(...lats),
-                east: Math.max(...lngs),
-                west: Math.min(...lngs),
-            },
+        flyToBounds(
+            map,
+            boundsOf(points),
             { top: 190, bottom: 150, left: 40, right: 40 },
+            16,
+            duration,
         );
         // Only refit when the set of pins changes, not on every render.
     }, [map, pinKey]);
@@ -416,20 +423,22 @@ function ClusterMarker({ cluster }: { cluster: Cluster<Place> }) {
                 );
 
                 if (b.north - b.south < 0.0005 && b.east - b.west < 0.0005) {
-                    map.panTo(cluster.centre);
-                    map.setZoom((map.getZoom() ?? 12) + 3);
-                } else {
-                    map.fitBounds(b, {
-                        top: 190,
-                        bottom: 170,
-                        left: 50,
-                        right: 50,
+                    flyTo(map, {
+                        center: cluster.centre,
+                        zoom: Math.min((map.getZoom() ?? 12) + 3, 19),
                     });
+                } else {
+                    flyToBounds(
+                        map,
+                        b,
+                        { top: 190, bottom: 170, left: 50, right: 50 },
+                        18,
+                    );
                 }
             }}
         >
             <span
-                className="flex items-center justify-center rounded-full border-2 border-brand bg-paper font-semibold text-brand tabular-nums shadow-[0_2px_8px_rgba(30,27,24,0.25)] transition-transform active:scale-90"
+                className="flex animate-in items-center justify-center rounded-full border-2 border-brand bg-paper font-semibold text-brand tabular-nums shadow-[0_2px_8px_rgba(30,27,24,0.25)] transition-transform duration-200 zoom-in-75 fade-in active:scale-90 motion-reduce:animate-none"
                 style={{
                     width: size,
                     height: size,
@@ -507,8 +516,9 @@ function LocateButton({
             disabled={busy}
             onClick={() =>
                 onLocate((pos) => {
-                    map?.panTo(pos);
-                    map?.setZoom(14);
+                    if (map) {
+                        flyTo(map, { center: pos, zoom: 14 });
+                    }
                 })
             }
             className={cn(

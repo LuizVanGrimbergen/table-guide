@@ -25,7 +25,8 @@ export function MapPin({ place, on }: { place: Place; on: boolean }) {
     const h = Math.round(w * 1.25);
 
     return (
-        <span className="relative flex flex-col items-center">
+        // Pins fade in when groups split apart, instead of popping up.
+        <span className="relative flex animate-in flex-col items-center duration-200 zoom-in-75 fade-in motion-reduce:animate-none">
             <span
                 className="relative transition-all duration-150"
                 style={{
