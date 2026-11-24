@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { ChevronRight, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { BottomSheet } from '@/components/tc/bottom-sheet';
 import { TonightHelper } from '@/components/tc/tonight-helper';
@@ -244,9 +245,31 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                     )}
                 </section>
 
+                <Link
+                    href={`/tables?party=${guests}`}
+                    className="mt-4 flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-paper px-5 transition duration-120 active:scale-[.98]"
+                >
+                    <Clock
+                        className="size-5 shrink-0 text-brand"
+                        strokeWidth={1.6}
+                    />
+                    <span className="flex-1">
+                        <span className="block text-[17px] font-medium">
+                            Check free tables
+                        </span>
+                        <span className="block text-[13px] text-ink-muted">
+                            Live times for the places in your checker
+                        </span>
+                    </span>
+                    <ChevronRight
+                        className="size-5 text-stone"
+                        strokeWidth={1.5}
+                    />
+                </Link>
+
                 <p className="mt-6 text-[13px] text-ink-muted">
-                    Book opens the restaurant's own page. Live table times come
-                    later.
+                    Book opens the restaurant's own page. Nothing is booked
+                    until the restaurant confirms.
                 </p>
             </div>
 
@@ -273,8 +296,7 @@ export default function TonightPage({ places, homeCity, aiEnabled }: Props) {
                                 : 'Find their booking page'}
                         </a>
                         <p className="mt-5 rounded-card bg-warm-tint p-4 text-[14px] text-quote">
-                            Nothing is booked until the restaurant confirms. We
-                            can't see live tables yet.
+                            Nothing is booked until the restaurant confirms.
                         </p>
                     </>
                 )}

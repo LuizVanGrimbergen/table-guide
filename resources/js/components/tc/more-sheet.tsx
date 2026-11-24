@@ -9,6 +9,7 @@ export const MORE_ITEMS: Item[] = [
     { label: 'Favourites', href: '/collection?status=fav&city=All' },
     { label: 'Wishlist', href: '/collection?status=wish&city=All' },
     { label: 'Tonight', href: '/tonight' },
+    { label: 'Free tables', href: '/tables' },
     { label: 'My Circle', href: '/friends' },
     { label: 'Dinner plans', hint: 'Coming soon' },
     { label: 'Settings', href: '/settings/profile' },
