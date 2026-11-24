@@ -23,7 +23,11 @@ class AvailabilityManager
     /** @var array<string, class-string<AvailabilityProvider>> */
     private const array ADAPTERS = [
         BookingProvider::SevenRooms->value => SevenRoomsProvider::class,
-        // OpenTable, Now Book It and ResDiary get an adapter here later.
+        BookingProvider::NowBookIt->value => NowBookItProvider::class,
+        // OpenTable: its pages sit behind Akamai bot protection, so a server
+        // can't ask it without getting around that. We don't: those places
+        // show "can't be checked" and open their booking page.
+        // ResDiary: no adapter until a Sydney venue on it can be looked at.
     ];
 
     public function __construct(private readonly Container $container) {}

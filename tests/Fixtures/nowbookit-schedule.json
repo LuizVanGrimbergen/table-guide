@@ -1,0 +1,114 @@
+{
+    "_comment": "Shape of Now Book It's get-schedule answer, as seen for a Sydney venue (8 people, 28 Nov 2026) on 24 Nov 2026. Trimmed; flags kept as observed. The booking page offered 5:30 pm and 5:45 pm only.",
+    "isVenueOpen": true,
+    "dayName": null,
+    "blockoutMessage": null,
+    "currentBookingsOnStandbyList": 0,
+    "maxBookingsOnStandbyList": 0,
+    "tags": [],
+    "services": [
+        {
+            "id": "service_test",
+            "name": "Dinner",
+            "serviceType": "Dinner",
+            "online": true,
+            "bookingInterval": 15,
+            "duration": 120,
+            "sections": [
+                { "id": "section_test", "name": "Dining Room", "order": 0 }
+            ],
+            "times": [
+                {
+                    "name": "5:30pm",
+                    "time": "2026-11-28T17:30:00",
+                    "expired": false,
+                    "isBlockOut": false,
+                    "bookingOptionsCount": 0,
+                    "isStandByListAvailable": false,
+                    "includesWalkInTables": false,
+                    "onlySharedTablesRemain": false,
+                    "sections": [
+                        {
+                            "id": "section_test",
+                            "sectionState": true,
+                            "isSectionBlocked": false,
+                            "availableTableIds": null
+                        }
+                    ]
+                },
+                {
+                    "name": "5:45pm",
+                    "time": "2026-11-28T17:45:00",
+                    "expired": false,
+                    "isBlockOut": false,
+                    "bookingOptionsCount": 0,
+                    "isStandByListAvailable": false,
+                    "includesWalkInTables": false,
+                    "onlySharedTablesRemain": false,
+                    "sections": [
+                        {
+                            "id": "section_test",
+                            "sectionState": true,
+                            "isSectionBlocked": false,
+                            "availableTableIds": null
+                        }
+                    ]
+                },
+                {
+                    "name": "6:00pm",
+                    "time": "2026-11-28T18:00:00",
+                    "expired": false,
+                    "isBlockOut": false,
+                    "bookingOptionsCount": 0,
+                    "isStandByListAvailable": false,
+                    "includesWalkInTables": false,
+                    "onlySharedTablesRemain": true,
+                    "sections": [
+                        {
+                            "id": "section_test",
+                            "sectionState": false,
+                            "isSectionBlocked": false,
+                            "availableTableIds": null
+                        }
+                    ]
+                },
+                {
+                    "name": "6:15pm",
+                    "time": "2026-11-28T18:15:00",
+                    "expired": false,
+                    "isBlockOut": true,
+                    "bookingOptionsCount": 0,
+                    "isStandByListAvailable": false,
+                    "includesWalkInTables": false,
+                    "onlySharedTablesRemain": true,
+                    "sections": [
+                        {
+                            "id": "section_test",
+                            "sectionState": false,
+                            "isSectionBlocked": true,
+                            "availableTableIds": null
+                        }
+                    ]
+                },
+                {
+                    "name": "7:30pm",
+                    "time": "2026-11-28T19:30:00",
+                    "expired": false,
+                    "isBlockOut": false,
+                    "bookingOptionsCount": 12,
+                    "isStandByListAvailable": false,
+                    "includesWalkInTables": false,
+                    "onlySharedTablesRemain": true,
+                    "sections": [
+                        {
+                            "id": "section_test",
+                            "sectionState": false,
+                            "isSectionBlocked": false,
+                            "availableTableIds": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

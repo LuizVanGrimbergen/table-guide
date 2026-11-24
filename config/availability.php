@@ -20,4 +20,10 @@ return [
         // Set SEVENROOMS_AVAILABILITY_URL to an empty value to switch lookups off.
         'endpoint' => env('SEVENROOMS_AVAILABILITY_URL', 'https://www.sevenrooms.com/api-yoa/availability/ng/widget/range'),
     ],
+
+    'nowbookit' => [
+        // Read from a Now Book It booking page on 24 Nov 2026; the venue id is
+        // added to the end. See app/Services/Availability/NowBookItProvider.php.
+        'endpoint' => env('NOWBOOKIT_AVAILABILITY_URL', 'https://api.nowbookit.com/bookings/get-schedule/venue'),
+    ],
 ];
