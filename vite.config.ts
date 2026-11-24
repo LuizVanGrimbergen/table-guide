@@ -43,6 +43,10 @@ export default defineConfig({
             ],
         },
     },
+    test: {
+        // Only our own tests, not test files shipped inside vendor packages.
+        include: ['resources/js/**/*.test.{ts,tsx}'],
+    },
     lint: {
         ignorePatterns: [
             'vendor/**',
