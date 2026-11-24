@@ -50,6 +50,7 @@ Opened from Tonight ("Check free tables", carries the number of people) and from
 - Offline: a note that free times need the internet; nothing old is shown.
 - Footnote: times come from each restaurant's booking system and can change; nothing is booked until he confirms there and the restaurant confirms.
 - Booking details (platform, venue ID, booking link) are edited on the restaurant page under Details > Booking > Edit.
+- Which platforms can be checked: SevenRooms and Now Book It (endpoints read from their own booking pages on 24 Nov 2026). OpenTable sits behind bot protection, so its places show "OpenTable doesn't let us check free times" and open their page; we don't get around that protection. ResDiary waits until a Sydney venue on it can be looked at.
 
 ## Map
 Full screen Google Map, kept calm: one slim top bar, one chip row, swipe cards at the bottom.
@@ -57,7 +58,7 @@ Full screen Google Map, kept calm: one slim top bar, one chip row, swipe cards a
 - Pins are teardrops in the status colour with the cuisine line icon inside (same icons as Home's Favourites): green = been, white with ochre outline = wishlist, wine = favourite, small grey = not recommended. Pins that sit too close together merge into a numbered bubble (wine ring when it holds favourites); tapping it zooms in. From street level every pin shows on its own.
 - Bottom: a row of place cards to swipe through (cuisine icon block, status, distance when known, name, his note, cuisine · area, Directions). Swiping selects that pin and the map follows; tapping a pin brings its card to the middle; tapping a card opens the place. Order: nearest first when location is known, otherwise favourites, been, wishlist.
 - "Near me" (in the Where sheet) uses the phone's live location, asked for only when he taps "Use my location", never stored or sent to the server. It then offers Anywhere in the city, Within 1, 2, 5 or 10 km with counts; the map then draws that circle around a "you are here" dot. Straight-line distance, not travel time. No home address is stored: friends use the app from wherever they are.
-- The map zooms to fit the pins whenever the filters change; when nothing matches, a card offers "Show all places".
+- The map glides (about half a second, eased) to fit the pins whenever the filters change, when a numbered bubble is tapped, and to "where am I"; with reduced motion on it jumps instead. Pins regroup once the map comes to rest, not during a pinch, and fade in as groups split. When nothing matches, a card offers "Show all places".
 - Google's own points of interest are hidden through the Map ID's map style in Google Cloud Console, not in code.
 
 ## Friends (My Circle)
