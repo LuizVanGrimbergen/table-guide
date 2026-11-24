@@ -15,9 +15,9 @@ return [
     ),
 
     'sevenrooms' => [
-        // TODO(availability): the booking widget's availability URL, without
-        // the "?..." part. How to find it: app/Services/Availability/SevenRoomsProvider.php.
-        // Empty means not configured: lookups answer "unknown".
-        'endpoint' => env('SEVENROOMS_AVAILABILITY_URL'),
+        // The booking widget's availability URL, read from Bistecca's booking
+        // page on 24 Nov 2026. See app/Services/Availability/SevenRoomsProvider.php.
+        // Set SEVENROOMS_AVAILABILITY_URL to an empty value to switch lookups off.
+        'endpoint' => env('SEVENROOMS_AVAILABILITY_URL', 'https://www.sevenrooms.com/api-yoa/availability/ng/widget/range'),
     ],
 ];

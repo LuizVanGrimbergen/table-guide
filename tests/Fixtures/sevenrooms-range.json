@@ -1,0 +1,98 @@
+{
+    "_comment": "Shape of SevenRooms' widget availability answer, as seen for Bistecca (4 people, 25 Nov 2026) on 24 Nov 2026. Trimmed; values kept as observed. Only 'book' times are bookable.",
+    "status": 200,
+    "request_id": "test",
+    "data": {
+        "availability": {
+            "2026-11-25": [
+                {
+                    "name": "Lunch Mo-Su",
+                    "shift_category": "LUNCH",
+                    "shift_id": "test-lunch",
+                    "shift_persistent_id": "test-lunch",
+                    "is_closed": false,
+                    "is_forced_empty_availability": false,
+                    "is_previous_version": false,
+                    "upsell_categories": [],
+                    "times": [
+                        {
+                            "type": "book",
+                            "sort_order": 1,
+                            "time": "12:00",
+                            "time_iso": "2026-11-25 12:00:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "Dining Room",
+                            "is_requestable": false
+                        },
+                        {
+                            "type": "request",
+                            "sort_order": 2,
+                            "time": "12:15",
+                            "time_iso": "2026-11-25 12:15:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "",
+                            "is_requestable": true
+                        },
+                        {
+                            "type": "request",
+                            "sort_order": 3,
+                            "time": "12:30",
+                            "time_iso": "2026-11-25 12:30:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "",
+                            "is_requestable": true
+                        },
+                        {
+                            "type": "book",
+                            "sort_order": 4,
+                            "time": "14:30",
+                            "time_iso": "2026-11-25 14:30:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "Dining Room",
+                            "is_requestable": false
+                        },
+                        {
+                            "type": "book",
+                            "sort_order": 5,
+                            "time": "14:30",
+                            "time_iso": "2026-11-25 14:30:00",
+                            "access_persistent_id": "b",
+                            "public_time_slot_description": "Bar",
+                            "is_requestable": false
+                        }
+                    ]
+                },
+                {
+                    "name": "Dinner Mo-Su",
+                    "shift_category": "DINNER",
+                    "shift_id": "test-dinner",
+                    "shift_persistent_id": "test-dinner",
+                    "is_closed": false,
+                    "is_forced_empty_availability": false,
+                    "is_previous_version": false,
+                    "upsell_categories": [],
+                    "times": [
+                        {
+                            "type": "request",
+                            "sort_order": 1,
+                            "time": "17:30",
+                            "time_iso": "2026-11-25 17:30:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "",
+                            "is_requestable": true
+                        },
+                        {
+                            "type": "request",
+                            "sort_order": 2,
+                            "time": "19:00",
+                            "time_iso": "2026-11-25 19:00:00",
+                            "access_persistent_id": "a",
+                            "public_time_slot_description": "",
+                            "is_requestable": true
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

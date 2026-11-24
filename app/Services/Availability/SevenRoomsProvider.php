@@ -9,31 +9,29 @@ use Carbon\CarbonInterface;
  * Free tables on SevenRooms (e.g. Bistecca, venue id "bistecca").
  *
  * SevenRooms has no public API. Its booking widget loads free times from
- * an internal JSON endpoint, and that is what this adapter asks. Until the
- * TODOs below are filled in, every lookup answers "not_configured" and the
- * screen shows "unknown": nothing is ever guessed.
+ * an internal JSON endpoint, and that is what this adapter asks. Read on
+ * 24 Nov 2026 from Bistecca's public booking page (DevTools > Network):
  *
- * ---------------------------------------------------------------------------
- * HOW TO FIND THE ENDPOINT (about 5 minutes, on a computer, in Chrome)
- * ---------------------------------------------------------------------------
- * 1. Open a SevenRooms restaurant's booking page, for example
- *    https://www.sevenrooms.com/explore/bistecca/reservations/create/search/
- * 2. Open DevTools (Cmd+Option+I), tab "Network", and tick "Fetch/XHR".
- *    Click the clear button (circle with a line) so the list is empty.
- * 3. On the page, pick a date and a number of guests, so it shows times.
- * 4. In the Network list, click the request that appeared just then. Look
- *    in its "Response" (or "Preview") tab for the times you see on screen.
- * 5. From that request, copy into this file:
- *    - the URL without the "?..." part -> SEVENROOMS_AVAILABILITY_URL in .env
- *    - the names of the query parameters for the venue, the date, the number
- *      of people (and anything else it always sends) -> request()
- *    - the date format it uses (e.g. 2026-11-24 or 11-24-2026)
- *    - where in the response the free times sit -> times()
- * 6. Save one real response as tests/Fixtures/sevenrooms-availability.json
- *    and add a test that reads it, so a change on their side shows up.
+ * GET https://www.sevenrooms.com/api-yoa/availability/ng/widget/range
+ * ?venue=bistecca&party_size=4&start_date=2026-11-25&num_days=1
+ * &time_slot=7:00 PM&halo_size_interval=100&channel=SEVENROOMS_WIDGET
+ * &selected_lang_code=en&include_pdr=false
  *
- * Never fill these in from memory or from a blog post: only from what the
- * real booking page sends today.
+ * {"status": 200, "data": {"availability": {"2026-11-25": [
+ * {"name": "Lunch Mo-Su", "shift_category": "LUNCH", "is_closed": false,
+ * "times": [{"time": "12:00", "time_iso": "2026-11-25 12:00:00",
+ * "type": "book", ...}, {"time": "12:15", "type": "request", ...}]},
+ * {"shift_category": "DINNER", ...}]}}}
+ *
+ * Only "book" times can be booked; "request" times can only be asked for
+ * (the page then says no table is available), so they don't count. The
+ * whole day comes back whatever time_slot says, so one answer per date and
+ * party serves every time he picks.
+ *
+ * If SevenRooms changes this, lookups answer "unexpected_response" and the
+ * screen shows "unknown". To check again: open the booking page above,
+ * DevTools > Network > Fetch/XHR, pick a date, and look at the "range"
+ * request. tests/Fixtures/sevenrooms-range.json holds the shape we expect.
  */
 class SevenRoomsProvider extends HttpAvailabilityProvider implements PrefillsBookingLink
 {
@@ -66,8 +64,6 @@ class SevenRoomsProvider extends HttpAvailabilityProvider implements PrefillsBoo
 
     public function request(Restaurant $restaurant, CarbonInterface $date, int $partySize): ?array
     {
-        // TODO(availability): set SEVENROOMS_AVAILABILITY_URL in .env to the
-        // URL from step 5 (see config/availability.php).
         $endpoint = config('availability.sevenrooms.endpoint');
 
         if (! is_string($endpoint) || $endpoint === '') {
@@ -77,20 +73,51 @@ class SevenRoomsProvider extends HttpAvailabilityProvider implements PrefillsBoo
         return [
             'url' => $endpoint,
             'query' => [
-                // TODO(availability): use the real parameter names from step 5, e.g.
-                // '<venue param>' => $restaurant->booking_venue_id,
-                // '<date param>' => $date->format('<their date format>'),
-                // '<party param>' => $partySize,
+                'venue' => (string) $restaurant->booking_venue_id,
+                'party_size' => $partySize,
+                'start_date' => $date->format('Y-m-d'),
+                'num_days' => 1,
+                'time_slot' => '7:00 PM',
+                'halo_size_interval' => 100,
+                'channel' => 'SEVENROOMS_WIDGET',
+                'selected_lang_code' => 'en',
+                'include_pdr' => 'false',
             ],
         ];
     }
 
     protected function times(array $json): ?array
     {
-        // TODO(availability): return the bookable times from the response, as
-        // strings like "19:00" or "7:00 PM", from step 5. Only count times
-        // the platform marks as bookable for this party. Return null when
-        // the shape isn't what you expect, so the screen says "unknown".
-        return null;
+        $days = $json['data']['availability'] ?? null;
+
+        if (! is_array($days)) {
+            return null;
+        }
+
+        $times = [];
+
+        foreach ($days as $shifts) {
+            if (! is_array($shifts)) {
+                return null;
+            }
+
+            foreach ($shifts as $shift) {
+                if (! is_array($shift) || ! isset($shift['times']) || ! is_array($shift['times'])) {
+                    return null;
+                }
+
+                if (($shift['is_closed'] ?? false) === true) {
+                    continue;
+                }
+
+                foreach ($shift['times'] as $slot) {
+                    if (is_array($slot) && ($slot['type'] ?? null) === 'book' && is_string($slot['time'] ?? null)) {
+                        $times[] = $slot['time'];
+                    }
+                }
+            }
+        }
+
+        return $times;
     }
 }

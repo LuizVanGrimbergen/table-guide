@@ -27,11 +27,12 @@ beforeEach(function () {
     $this->date = CarbonImmutable::parse('2026-11-28');
 });
 
-test('the manager picks the SevenRooms adapter and has none yet for the others', function () {
+test('the manager picks the adapter, and has none for OpenTable and ResDiary', function () {
     $manager = app(AvailabilityManager::class);
 
     expect($manager->provider(BookingProvider::SevenRooms))->toBeInstanceOf(SevenRoomsProvider::class)
         ->and($manager->provider(BookingProvider::OpenTable))->toBeNull()
+        ->and($manager->provider(BookingProvider::ResDiary))->toBeNull()
         ->and($manager->provider(BookingProvider::Phone))->toBeNull();
 });
 
@@ -46,7 +47,9 @@ test('phone, no platform and unsupported platforms are never asked', function (B
     [BookingProvider::OpenTable, 'provider_unsupported'],
 ]);
 
-test('SevenRooms says not configured until its endpoint is filled in, and sends nothing', function () {
+test('SevenRooms lookups can be switched off, and then send nothing', function () {
+    config(['availability.sevenrooms.endpoint' => '']);
+
     $result = app(AvailabilityManager::class)->getSlots(restaurantOn(BookingProvider::SevenRooms), $this->date, 2);
 
     expect($result['error'])->toBe('not_configured')
@@ -115,14 +118,6 @@ test('an adapter that throws only fails its own restaurant', function () {
 
     expect($results[1]['error'])->toBe('failed')
         ->and($results[2]['slots'])->toBe(['19:00']);
-});
-
-test('SevenRooms with a URL but no response reader yet says unknown, not full', function () {
-    config(['availability.sevenrooms.endpoint' => 'https://booking.test/sevenrooms']);
-    Http::fake(['booking.test/*' => Http::response(['anything' => true])]);
-
-    expect(app(AvailabilityManager::class)->getSlots(restaurantOn(BookingProvider::SevenRooms), $this->date, 2)['error'])
-        ->toBe('unexpected_response');
 });
 
 test('a SevenRooms booking link opens with the date, time and party filled in', function () {
