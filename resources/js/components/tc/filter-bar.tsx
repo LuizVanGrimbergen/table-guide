@@ -202,14 +202,12 @@ export function FilterBar({
                                         key={d.km}
                                         label={`Within ${d.km} km`}
                                         hint={d.hint}
-                                        count={
-                                            countWhere(
-                                                places,
-                                                filters,
-                                                null,
-                                                (p) => near.within(p, d.km),
-                                            )
-                                        }
+                                        count={countWhere(
+                                            places,
+                                            filters,
+                                            null,
+                                            (p) => near.within(p, d.km),
+                                        )}
                                         on={km === d.km}
                                         onChoose={() => {
                                             near.setKm(d.km);
@@ -440,7 +438,10 @@ export function FilterSummary({
 }) {
     return (
         <div className={cn('flex min-h-11 items-center gap-2', className)}>
-            <p className="min-w-0 flex-1 truncate text-[15px]" aria-live="polite">
+            <p
+                className="min-w-0 flex-1 truncate text-[15px]"
+                aria-live="polite"
+            >
                 <span className="font-semibold tabular-nums">
                     {count} {count === 1 ? 'place' : 'places'}
                 </span>

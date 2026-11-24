@@ -72,13 +72,7 @@ export function groupByArea(places: Place[], city: string): Group[] {
 }
 
 /** His places as compact rows, grouped under area headings. */
-export function PlaceList({
-    places,
-    city,
-}: {
-    places: Place[];
-    city: string;
-}) {
+export function PlaceList({ places, city }: { places: Place[]; city: string }) {
     if (places.length < GROUP_FROM) {
         return (
             <ul className="divide-y divide-line">

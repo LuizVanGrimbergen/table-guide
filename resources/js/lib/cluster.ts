@@ -11,7 +11,10 @@ const RADIUS_PX = 40;
 export const NO_CLUSTER_ZOOM = 16;
 
 /** Web Mercator world pixel position at a zoom level. */
-function toPixels({ lat, lng }: LatLng, zoom: number): { x: number; y: number } {
+function toPixels(
+    { lat, lng }: LatLng,
+    zoom: number,
+): { x: number; y: number } {
     const scale = 256 * 2 ** zoom;
     const sin = Math.min(
         Math.max(Math.sin((lat * Math.PI) / 180), -0.9999),

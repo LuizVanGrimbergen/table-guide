@@ -152,7 +152,7 @@ export default function HomePage({ places, homeCity, received }: Props) {
                                         See all
                                     </Link>
                                 </div>
-                                <div className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
+                                <div className="-mx-5 flex snap-x [scrollbar-width:none] gap-3 overflow-x-auto px-5 pb-1 md:mx-0 md:px-0">
                                     {favourites.map((p) => (
                                         <div key={p.id} className="snap-start">
                                             <FavouriteTile place={p} />

@@ -78,7 +78,9 @@ export function PlaceCarousel({
                     continue;
                 }
 
-                const gap = Math.abs(el.offsetLeft + el.clientWidth / 2 - middle);
+                const gap = Math.abs(
+                    el.offsetLeft + el.clientWidth / 2 - middle,
+                );
 
                 if (gap < bestGap) {
                     bestGap = gap;
@@ -98,7 +100,7 @@ export function PlaceCarousel({
         <div
             ref={scroller}
             onScroll={onScroll}
-            className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-[max(16px,calc(50%-170px))] pb-4 [scrollbar-width:none]"
+            className="flex snap-x snap-mandatory [scrollbar-width:none] gap-3 overflow-x-auto px-[max(16px,calc(50%-170px))] pb-4"
         >
             {places.map((p) => (
                 <PlaceCard

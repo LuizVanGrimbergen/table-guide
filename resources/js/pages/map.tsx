@@ -54,12 +54,7 @@ function rank(p: Place): number {
     return p.status === 'been' ? 1 : 2;
 }
 
-export default function MapPage({
-    places,
-    homeCity,
-    mapId,
-    cities,
-}: Props) {
+export default function MapPage({ places, homeCity, mapId, cities }: Props) {
     const [filters, setFilters] = useState<Filters>(() =>
         defaultFilters(homeCity),
     );
@@ -67,9 +62,7 @@ export default function MapPage({
     const [maxKm, setMaxKm] = useState<number | null>(null);
     const [zoom, setZoom] = useState(12);
     // Set when a swipe lands on a card, so the map follows along.
-    const [panTo, setPanTo] = useState<{ to: LatLng; n: number } | null>(
-        null,
-    );
+    const [panTo, setPanTo] = useState<{ to: LatLng; n: number } | null>(null);
 
     // Live location: asked for only when he taps "Use my location" or the
     // locate button, never on page load, and never sent to the server.
@@ -358,14 +351,16 @@ function FitToPins({
                           lng:
                               centre.lng +
                               radiusKm /
-                                  (111 * Math.cos((centre.lat * Math.PI) / 180)),
+                                  (111 *
+                                      Math.cos((centre.lat * Math.PI) / 180)),
                       },
                       {
                           lat: centre.lat,
                           lng:
                               centre.lng -
                               radiusKm /
-                                  (111 * Math.cos((centre.lat * Math.PI) / 180)),
+                                  (111 *
+                                      Math.cos((centre.lat * Math.PI) / 180)),
                       },
                   ]
                 : places.map((p) => ({ lat: p.lat!, lng: p.lng! }));
@@ -452,7 +447,11 @@ function ClusterMarker({ cluster }: { cluster: Cluster<Place> }) {
 }
 
 /** Pans to the card he swiped to, unless that pin is already well in view. */
-function FollowSwipe({ request }: { request: { to: LatLng; n: number } | null }) {
+function FollowSwipe({
+    request,
+}: {
+    request: { to: LatLng; n: number } | null;
+}) {
     const map = useMap();
 
     useEffect(() => {
