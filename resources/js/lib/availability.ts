@@ -69,7 +69,7 @@ export function unknownReason(
         case 'no_venue_id':
             return 'Venue ID missing. Add it under Booking details.';
         case 'provider_unsupported':
-            return `${providerLabel} can't be checked yet`;
+            return `${providerLabel} doesn't let us check free times. Open their page to see.`;
         case 'unreachable':
             return "Their booking system didn't answer";
         case 'rate_limited':

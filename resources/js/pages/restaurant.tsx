@@ -87,16 +87,36 @@ type BookingProviderKey =
     | 'phone'
     | 'none';
 
+/**
+ * venueHint is set for the platforms the table checker can ask; it says
+ * where the venue ID sits in their booking link.
+ */
 const BOOKING_PROVIDERS: Record<
     BookingProviderKey,
-    { label: string; hint: string; online: boolean }
+    { label: string; hint: string; venueHint?: string }
 > = {
-    sevenrooms: { label: 'SevenRooms', hint: 'Online', online: true },
-    opentable: { label: 'OpenTable', hint: 'Online', online: true },
-    nowbookit: { label: 'Now Book It', hint: 'Online', online: true },
-    resdiary: { label: 'ResDiary', hint: 'Online', online: true },
-    phone: { label: 'By phone', hint: 'No online bookings', online: false },
-    none: { label: 'Not set', hint: 'Or no bookings taken', online: false },
+    sevenrooms: {
+        label: 'SevenRooms',
+        hint: 'Free times can be checked',
+        venueHint:
+            'The name after /explore/ in their booking link, e.g. bistecca.',
+    },
+    nowbookit: {
+        label: 'Now Book It',
+        hint: 'Free times can be checked',
+        venueHint:
+            'The number after venueid= in their booking link, e.g. 11136.',
+    },
+    opentable: {
+        label: 'OpenTable',
+        hint: "Books online; free times can't be checked",
+    },
+    resdiary: {
+        label: 'ResDiary',
+        hint: "Books online; free times can't be checked yet",
+    },
+    phone: { label: 'By phone', hint: 'No online bookings' },
+    none: { label: 'Not set', hint: 'Or no bookings taken' },
 };
 
 const MENU_KINDS = {
@@ -712,7 +732,7 @@ function BookingDetailsSheet({
         booking_venue_id: restaurant.bookingVenueId ?? '',
         booking_url: restaurant.bookingUrl ?? '',
     });
-    const online = BOOKING_PROVIDERS[form.data.booking_provider].online;
+    const venueHint = BOOKING_PROVIDERS[form.data.booking_provider].venueHint;
 
     return (
         <BottomSheet
@@ -751,7 +771,7 @@ function BookingDetailsSheet({
                     message={form.errors.booking_provider}
                 />
 
-                {online && (
+                {venueHint && (
                     <>
                         <label
                             htmlFor="booking_venue_id"
@@ -775,7 +795,7 @@ function BookingDetailsSheet({
                             className={field}
                         />
                         <p className="mt-1 text-[13px] text-ink-muted">
-                            Usually the last part of their booking link.
+                            {venueHint}
                         </p>
                         <InputError
                             className="mt-1"

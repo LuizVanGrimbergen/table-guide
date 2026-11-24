@@ -37,7 +37,7 @@ describe('table checker helpers', () => {
         }
 
         expect(unknownReason('provider_unsupported', 'OpenTable')).toBe(
-            "OpenTable can't be checked yet",
+            "OpenTable doesn't let us check free times. Open their page to see.",
         );
     });
 
