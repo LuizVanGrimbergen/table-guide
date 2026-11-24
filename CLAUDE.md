@@ -34,8 +34,8 @@ Never commit keys. Never hardcode keys in components.
 ## Data model
 
 - `users`: name, email, taste_tags (json, e.g. ["Italian","Pizza"]), default_visibility (private|friends|public)
-- `restaurants`: shared facts only. name, city, area, country, address, lat, lng, google_place_id, website, phone, price_level, cuisine, occasion, verify_status (verified|needs_review|possibly_closed|closed), verified_at
-- `saved_entries`: one per user per restaurant. user_id, restaurant_id, status (been|wish), favourite (bool), not_recommended (bool), rating (1..5 nullable), note (text, private by default), recommended_by, visited_on, visibility, good_for (json)
+- `restaurants`: shared facts only. name, city, area, country, address, lat, lng, google_place_id, website, phone, booking_provider (sevenrooms|opentable|nowbookit|resdiary|phone|none), booking_venue_id, booking_url, price_level, cuisine, occasion, verify_status (verified|needs_review|possibly_closed|closed), verified_at
+- `saved_entries`: one per user per restaurant. user_id, restaurant_id, status (been|wish), favourite (bool), not_recommended (bool), in_checker (bool, shown in their table checker), rating (1..5 nullable), note (text, private by default), recommended_by, visited_on, visibility, good_for (json)
 - `menu_links`: restaurant_id, kind (food|drinks|wine), url, source (verified|user), checked_at, maybe_stale
 - `friendships`: user_id, friend_id, status (pending|accepted), invite_token
 - `recommendations`: from_user_id, to_user_id nullable, public_token nullable, restaurant_id, message, saved_at
@@ -70,7 +70,8 @@ Write `php artisan collection:import data/restaurants.json {user_email}` that cr
 ## Honesty rules (do not break)
 
 - Never invent menus, dishes, prices or available times.
-- No live availability: Book opens the restaurant's own booking page.
+- Free tables: only show times the booking platform itself returned for that date and party size. Never guess, fill in or extrapolate times. If a lookup fails, say "unknown", not "full". The app never books: Book and every time opens the restaurant's own booking page, which always says nothing is booked until the restaurant confirms.
+- Never invent booking platform endpoints. Each adapter's URL is filled in by hand from the restaurant's own booking widget.
 - A calendar event is never a reservation. Show Proposed and Confirmed differently.
 - Show Google attribution where Places data is shown.
 
